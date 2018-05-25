@@ -1,0 +1,19 @@
+workspace:
+  base: /go
+  path: src/github.com/Oppodelldog/git-commit-hook
+
+pipeline:
+  build:
+    image: golang:1.9.4
+    commands:
+      - go get -u github.com/golang/dep/cmd/dep
+      - dep ensure
+      - go get ./...
+      - go get github.com/mattn/goveralls
+      - goveralls -service drone.io -repotoken BddPGJN9lAFBYHLGI5mIHLjZVJlD74n3X
+      - go build
+
+matrix:
+ GO_VERSION:
+   - latest
+   - "1.9"

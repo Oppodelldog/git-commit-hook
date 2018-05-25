@@ -44,7 +44,7 @@ lint: ## Run all the linters
 ci: lint test ## Run all the tests and code checks
 
 build: ## build binary to .build folder
-	go build -o ".build/git-commit-hook" main.go
+	go build -o ".build/git-commit-hook" cmd/main.go
 
 install: ## Install to <gopath>/src
 	go install ./...

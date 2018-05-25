@@ -18,8 +18,8 @@ fi
 git checkout $tag
 
 target_folder=".release"
-package="github.com/Oppodelldog/droxy"
-ldflags=-ldflags="-X github.com/Oppodelldog/droxy/version.Number=${tag}"
+package="github.com/Oppodelldog/git-commit-hook/cmd"
+ldflags=-ldflags="-X github.com/Oppodelldog/git-commit-hook/version.Number=${tag}"
 
 package_split=(${package//\// })
 package_name=${package_split[-1]}
