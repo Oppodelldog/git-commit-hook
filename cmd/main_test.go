@@ -25,7 +25,7 @@ var originals = struct {
 	exitFunc                 exitFuncDef
 	osStdout                 *os.File
 }{
-	osArgs: os.Args,
+	osArgs:                   os.Args,
 	rewriteCommitMessageFunc: rewriteCommitMessageFunc,
 	exitFunc:                 exitFunc,
 	osStdout:                 os.Stdout,
@@ -89,7 +89,7 @@ func TestMain_ErrorCase_CommitMessageFileNotFound(t *testing.T) {
 	w.Close()
 
 	stdOutput := <-stdOutChannel
-	assert.Exactly(t, "error reading commit message from '.git/COMMIT_EDITMSG': open .git/COMMIT_EDITMSG: no such file or directory", stdOutput)
+	assert.Contains(t, stdOutput, "error reading commit message from '.git/COMMIT_EDITMSG':")
 }
 
 func TestMain_ErrorCase_GitError(t *testing.T) {
@@ -149,8 +149,8 @@ func initGitRepositoryWithBranch(t *testing.T, branchName string) {
 	if err != nil {
 		t.Fatalf("could not write README.md: %v", err)
 	}
-	git(t,"config","user.email","odog@git-commit-hook.ok")
-	git(t,"config","user.name","odog")
+	git(t, "config", "user.email", "odog@git-commit-hook.ok")
+	git(t, "config", "user.name", "odog")
 	git(t, "add", "-A")
 	git(t, "commit", "-m", "initial commit")
 	git(t, "checkout", "-b", branchName)
