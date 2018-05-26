@@ -35,7 +35,7 @@ func ModifyGitCommitMessage(gitCommitMessage string) (modifiedCommitMessage stri
 
 	if !featureBranchDetectFunc(branchName) {
 		if !featureBranchDetectFunc(gitCommitMessage) {
-			err = errors.New("feature reference is required")
+			err = errors.Errorf("feature reference is required in '%s'", gitCommitMessage)
 			return
 		}
 	}
