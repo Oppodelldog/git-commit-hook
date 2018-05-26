@@ -149,6 +149,8 @@ func initGitRepositoryWithBranch(t *testing.T, branchName string) {
 	if err != nil {
 		t.Fatalf("could not write README.md: %v", err)
 	}
+	git(t,"config","user.email","odog@git-commit-hook.ok")
+	git(t,"config","user.name","odog")
 	git(t, "add", "-A")
 	git(t, "commit", "-m", "initial commit")
 	git(t, "checkout", "-b", branchName)
