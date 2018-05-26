@@ -8,12 +8,19 @@ import (
 	"github.com/Oppodelldog/git-commit-hook"
 )
 
-func main() {
-	commitMessage, err := gitcommithook.ModifyGitCommitMessage(os.Args[1])
-	if err != nil {
-		fmt.Printf("error in git hook: %s", err.Error())
-		os.Exit(1)
-	}
+type rewriteCommitMessageFuncDef func(string) error
+type exitFuncDef func(code int)
 
-	fmt.Print(commitMessage)
+var rewriteCommitMessageFunc = rewriteCommitMessageFuncDef(gitcommithook.RewriteCommitMessage)
+var exitFunc = exitFuncDef(os.Exit)
+
+func main() {
+	commitMessageFile := os.Args[1]
+	err := rewriteCommitMessageFunc(commitMessageFile)
+	if err != nil {
+		fmt.Print(err)
+		exitFunc(1)
+		return
+	}
+	exitFunc(0)
 }
