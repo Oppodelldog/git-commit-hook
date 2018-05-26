@@ -2,24 +2,19 @@ package gitcommithook
 
 import "regexp"
 
-//noinspection SpellCheckingInspection
-var falsePatterns = []string{
-	"^release$",
-	"^release/.*$",
-	"^master$",
-	"^develop",
-	"^hotfix/.*$",
+var patterns = []string{
+	`(?m)(?:\s|^|/)([A-Z]+-[0-9]+)([\s,;:!.-]|$)`,
 }
 
-//IsFeatureBranch returns true if the given branchname matches a valid feature branch
-func IsFeatureBranch(branchName string) bool {
-	for _, falsePattern := range falsePatterns {
-		if matches(falsePattern, branchName) {
-			return false
+//IsFeatureBranch detects weatcher the input matches one of the defined patterns
+func IsFeatureBranch(commitMessage string) bool {
+	for _, pattern := range patterns {
+		if matches(pattern, commitMessage) {
+			return true
 		}
 	}
 
-	return true
+	return false
 }
 
 func matches(regEx, input string) bool {

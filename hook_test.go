@@ -12,16 +12,13 @@ import (
 //this enables stubbing functions or user input
 var originals = struct {
 	gitBranchNameReaderFunc gitBranchNameReaderFuncDef
-	featureBranchDetectFunc featureBranchDetectFuncDef
 }{
 	gitBranchNameReaderFunc: gitBranchNameReaderFunc,
-	featureBranchDetectFunc: featureBranchDetectFunc,
 }
 
 //restoreOriginals resets the modules globals to the original state
 func restoreOriginals() {
 	gitBranchNameReaderFunc = originals.gitBranchNameReaderFunc
-	featureBranchDetectFunc = originals.featureBranchDetectFunc
 }
 
 func TestModifyGitCommitMessage(t *testing.T) {
@@ -32,25 +29,43 @@ func TestModifyGitCommitMessage(t *testing.T) {
 		output       string
 		returnsError bool
 	}{
-		"both set": {
+		"commit for feature branch": {
 			input:        "initial commit",
-			branchName:   "BRANCH",
-			output:       "BRANCH: initial commit",
+			branchName:   "PROJECT-123",
+			output:       "PROJECT-123: initial commit",
 			returnsError: false,
 		},
-		"empty input": {
-			input:        "",
-			branchName:   "BRANCH",
+		"commit for fix-branch with no feature reference": {
+			input:        "initial commit",
+			branchName:   "release/v1.0.1-fix",
 			output:       "",
 			returnsError: true,
 		},
-		"empty branchName": {
+		"commit for fix-branch with feature reference": {
+			input:        "feature/PROJECT-123 initial commit",
+			branchName:   "release/v1.0.1-fix",
+			output:       "release/v1.0.1-fix: feature/PROJECT-123 initial commit",
+			returnsError: false,
+		},
+		"commit for fix-branch with feature reference somewhere in the commit message": {
+			input:        "fixed something for PROJECT-123, should work now",
+			branchName:   "release/v1.0.1-fix",
+			output:       "release/v1.0.1-fix: fixed something for PROJECT-123, should work now",
+			returnsError: false,
+		},
+		"commit for feature without commit message": {
+			input:        "",
+			branchName:   "PROJECT-123",
+			output:       "",
+			returnsError: true,
+		},
+		"commit with broken branch name detection, but with commit message": {
 			input:        "initial commit",
 			branchName:   "",
 			output:       "",
 			returnsError: true,
 		},
-		"both empty": {
+		"commit with broken branch name detection and without commit message": {
 			input:        "",
 			branchName:   "",
 			output:       "",
@@ -67,6 +82,8 @@ func TestModifyGitCommitMessage(t *testing.T) {
 
 			if testData.returnsError {
 				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 			assert.Equal(t, testData.output, modifiedGitCommitMessage)
 
@@ -87,30 +104,12 @@ func TestModifyGitCommitMessage_branchNameReaderReturnsError_ExpectError(t *test
 	assert.Equal(t, expectedError, err)
 }
 
-func TestModifyGitCommitMessage_FixesRequireFeatureBranchReference(t *testing.T) {
-	defer restoreOriginals()
-
-	branchNameWillBe("no-feature-branch-name")
-	branchWillBeNoFeatureBranch()
-
-	inputMessage := "some rc-fix, what was the feature again? Hmm, I leave it out."
-
-	modifiedCommitMessage, err := ModifyGitCommitMessage(inputMessage)
-
-	assert.Error(t, err)
-	assert.Equal(t, "", modifiedCommitMessage)
-}
-
 func TestDefaultGitBranchNameReaderFunc(t *testing.T) {
 	assert.IsType(t, gitBranchNameReaderFuncDef(git.GetCurrentBranchName), gitBranchNameReaderFunc)
 }
 
 func TestDefaultFeatureBranchDetectFunc(t *testing.T) {
 	assert.IsType(t, featureBranchDetectFuncDef(IsFeatureBranch), featureBranchDetectFunc)
-}
-
-func branchWillBeNoFeatureBranch() {
-	featureBranchDetectFunc = func(branchName string) bool { return false }
 }
 
 func branchNameWillBe(s string) {

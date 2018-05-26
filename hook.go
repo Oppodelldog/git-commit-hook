@@ -28,14 +28,16 @@ func ModifyGitCommitMessage(gitCommitMessage string) (modifiedCommitMessage stri
 		return
 	}
 
-	if !featureBranchDetectFunc(branchName) {
-		err = errors.New("feature reference is required")
-		return
-	}
-
 	if branchName == "" {
 		err = errors.New("branch name was is empty")
 		return
+	}
+
+	if !featureBranchDetectFunc(branchName) {
+		if !featureBranchDetectFunc(gitCommitMessage) {
+			err = errors.New("feature reference is required")
+			return
+		}
 	}
 
 	modifiedCommitMessage = fmt.Sprintf("%s: %s", branchName, gitCommitMessage)

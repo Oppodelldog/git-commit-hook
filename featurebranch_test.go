@@ -13,8 +13,7 @@ func TestIsFeatureBranch_Positive(t *testing.T) {
 		expectedResult bool
 	}{
 		{"TOOL-1242", true},
-		{"someFeature", true},
-		{"some-feature", true},
+		{"feature/TOOL-1242", true},
 	}
 
 	for _, test := range testData {
