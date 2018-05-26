@@ -19,7 +19,7 @@ func TestIsFeatureBranch_Positive(t *testing.T) {
 	for _, test := range testData {
 		t.Run(test.branchName, func(t *testing.T) {
 			res := IsFeatureBranch(test.branchName)
-			assert.Equal(t, test.expectedResult, res)
+			assert.Exactly(t, test.expectedResult, res)
 		})
 	}
 }
@@ -40,7 +40,7 @@ func TestIsFeatureBranch_Negative(t *testing.T) {
 	for _, test := range testData {
 		t.Run(test.branchName, func(t *testing.T) {
 			res := IsFeatureBranch(test.branchName)
-			assert.Equal(t, test.expectedResult, res)
+			assert.Exactly(t, test.expectedResult, res)
 		})
 	}
 }

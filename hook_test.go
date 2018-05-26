@@ -3,6 +3,8 @@ package gitcommithook
 import (
 	"testing"
 
+	"reflect"
+
 	"github.com/Oppodelldog/git-commit-hook/git"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -85,7 +87,7 @@ func TestModifyGitCommitMessage(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, testData.output, modifiedGitCommitMessage)
+			assert.Exactly(t, testData.output, modifiedGitCommitMessage)
 
 			restoreOriginals()
 		})
@@ -101,15 +103,15 @@ func TestModifyGitCommitMessage_branchNameReaderReturnsError_ExpectError(t *test
 
 	_, err := ModifyGitCommitMessage("some message")
 
-	assert.Equal(t, expectedError, err)
+	assert.Exactly(t, expectedError, err)
 }
 
 func TestDefaultGitBranchNameReaderFunc(t *testing.T) {
-	assert.IsType(t, gitBranchNameReaderFuncDef(git.GetCurrentBranchName), gitBranchNameReaderFunc)
+	assert.Exactly(t, reflect.ValueOf(git.GetCurrentBranchName).Pointer(), reflect.ValueOf(gitBranchNameReaderFunc).Pointer())
 }
 
 func TestDefaultFeatureBranchDetectFunc(t *testing.T) {
-	assert.IsType(t, featureBranchDetectFuncDef(IsFeatureBranch), featureBranchDetectFunc)
+	assert.Exactly(t, reflect.ValueOf(IsFeatureBranch).Pointer(), reflect.ValueOf(featureBranchDetectFunc).Pointer())
 }
 
 func branchNameWillBe(s string) {

@@ -39,7 +39,7 @@ func TestGetCurrentBranchName_FindsBranchInCommandOutput(t *testing.T) {
 			}
 			branchName, err := GetCurrentBranchName()
 			assert.NoError(t, err)
-			assert.Equal(t, testCase.expectedBranchName, branchName)
+			assert.Exactly(t, testCase.expectedBranchName, branchName)
 		})
 	}
 }
@@ -48,8 +48,8 @@ func TestGetCurrentBranchName_ExpectGitCommandIsCalledProperly(t *testing.T) {
 	defer restoreOriginals()
 
 	execFunc = func(s1 string, s2 ...string) *exec.Cmd {
-		assert.Equal(t, "git", s1)
-		assert.Equal(t, []string{"branch"}, s2)
+		assert.Exactly(t, "git", s1)
+		assert.Exactly(t, []string{"branch"}, s2)
 
 		return exec.Command("", "")
 	}

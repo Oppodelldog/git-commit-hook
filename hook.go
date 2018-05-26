@@ -29,7 +29,7 @@ func ModifyGitCommitMessage(gitCommitMessage string) (modifiedCommitMessage stri
 	}
 
 	if branchName == "" {
-		err = errors.New("branch name was is empty")
+		err = errors.New("branch name is empty")
 		return
 	}
 
