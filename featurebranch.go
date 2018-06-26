@@ -3,7 +3,7 @@ package gitcommithook
 import "regexp"
 
 var patterns = []string{
-	`(?m)(?:\s|^|/)([A-Z]+-[0-9]+)([\s,;:!.-]|$)`,
+	`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`,
 }
 
 //IsFeatureBranch detects weatcher the input matches one of the defined patterns
