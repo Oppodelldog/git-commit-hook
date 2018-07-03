@@ -1,0 +1,31 @@
+"project xyz":
+  path: "/home/nils/projects/xyz"
+  branch:
+     master:
+       matcher: "^(origin\\/)*master"
+     feature:
+       matcher: "^((?!master|release|develop).)*$"
+     develop:
+       matcher: "^(origin\\/)*develop$"
+     release:
+       matcher: "^(origin\\/)*release\\/v([0-9]*\\.*)*$"
+     hotfix:
+       matcher: "^(origin\\/)*hotfix\\/v([0-9]*\\.*)*$"
+
+  template:
+    "*":
+      template: "{.BranchName}: {.CommitMessage}"
+
+  validation:
+     feature:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+     develop:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+       "(?m)@noissue" : "@noissue"
+     release:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+       "(?m)@rc-fix" : "an @rc-fix indicator"
+       "(?m)@noissue" : "@noissue"
+     master:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+       "(?m)@noissue" : "@noissue"
