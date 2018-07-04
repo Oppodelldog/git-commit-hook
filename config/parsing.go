@@ -2,6 +2,7 @@ package config
 
 import (
 	"io/ioutil"
+
 	"gopkg.in/yaml.v2"
 )
 

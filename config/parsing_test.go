@@ -2,6 +2,7 @@ package config
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,15 +13,14 @@ func TestParse(t *testing.T) {
 	}
 
 	expectedConfig := &Configuration{
-		"project xyz":
-		{
+		"project xyz": {
 			Path: "/home/nils/projects/xyz",
-			Branches: map[string]BranchMatcherConfiguration{
-				"master":  {Matcher: `^(origin\/)*master`},
-				"feature": {Matcher: `^((?!master|release|develop).)*$`},
-				"develop": {Matcher: `^(origin\/)*develop$`},
-				"release": {Matcher: `^(origin\/)*release\/v([0-9]*\.*)*$`},
-				"hotfix":  {Matcher: `^(origin\/)*hotfix\/v([0-9]*\.*)*$`},
+			BranchTypes: map[string]BranchTypeConfiguration{
+				"master":  {Pattern: `^(origin\/)*master`},
+				"feature": {Pattern: `^((?!master|release|develop).)*$`},
+				"develop": {Pattern: `^(origin\/)*develop$`},
+				"release": {Pattern: `^(origin\/)*release\/v([0-9]*\.*)*$`},
+				"hotfix":  {Pattern: `^(origin\/)*hotfix\/v([0-9]*\.*)*$`},
 			},
 			Templates: map[string]BranchTemplateConfiguration{
 				"*": {Template: `{.BranchName}: {.CommitMessage}`},

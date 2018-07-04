@@ -1,10 +1,9 @@
 package gitcommithook
 
 import (
+	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/git"
 	"github.com/pkg/errors"
-	"github.com/Oppodelldog/git-commit-hook/config"
-	"github.com/Oppodelldog/filediscovery"
 )
 
 type gitBranchNameReaderFuncDef func() (string, error)
@@ -17,7 +16,7 @@ var gitBranchNameReaderFunc = gitBranchNameReaderFuncDef(git.GetCurrentBranchNam
 // if the current branch name is detected to be NO feature branch, the user will be prompted to enter
 // a feature branch manually. This is then inserted in between current branch and commit message.
 // If no valid branch name could be determined the function returns an error
-func ModifyGitCommitMessage(gitCommitMessage string) (modifiedCommitMessage string, err error) {
+func ModifyGitCommitMessage(gitCommitMessage string, projectConfiguration config.ProjectConfiguration) (modifiedCommitMessage string, err error) {
 
 	if gitCommitMessage == "" {
 		err = errors.New("commit message is empty")
@@ -34,34 +33,22 @@ func ModifyGitCommitMessage(gitCommitMessage string) (modifiedCommitMessage stri
 		return
 	}
 
-	cfg, err := loadConfiguration()
+	viewModel := createViewModel(gitCommitMessage, branchName)
+	modifiedCommitMessage, err = projectConfiguration.RenderCommitMessage(branchName, viewModel)
 	if err != nil {
 		return
 	}
 
-	viewModel := map[string]string{"CommitMessage": gitCommitMessage}
-	modifiedCommitMessage, err := cfg.RenderCommitMessage(branchName, viewModel)
+	err = projectConfiguration.Validate(branchName, modifiedCommitMessage)
 	if err != nil {
-		return
+		modifiedCommitMessage = ""
 	}
-
-	err = cfg.Validate(branchName, modifiedCommitMessage)
 
 	return
 }
 
-func loadConfiguration() (*config.Configuration, error) {
-	const commitHookConfig = "git-commit-hook.yaml"
+func createViewModel(gitCommitMessage string, branchName string) config.ViewModel {
+	viewModel := config.ViewModel{CommitMessage: gitCommitMessage, BranchName: branchName}
 
-	filePath, err := filediscovery.New([]filediscovery.FileLocationProvider{
-		filediscovery.WorkingDirProvider(),
-		filediscovery.ExecutableDirProvider(),
-		filediscovery.HomeConfigDirProvider(".config", "git-commit-hook"),
-	}).Discover(commitHookConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return config.Parse(filePath)
+	return viewModel
 }

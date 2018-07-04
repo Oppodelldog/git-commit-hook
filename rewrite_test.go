@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +34,7 @@ func TestRewriteCommitMessage_ErrorCase_CannotFindCommitMessageFile(t *testing.T
 
 	commitMessageFileCannotBeFound(t)
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, config.ProjectConfiguration{})
 
 	assert.Contains(t, err.Error(), "error reading commit message")
 }
@@ -43,7 +44,7 @@ func TestRewriteCommitMessage_ErrorCase_ErrorModifyingMessage(t *testing.T) {
 	commitMessageFileCanBeRead(t)
 	errorModifyingCommitMessage(t)
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, config.ProjectConfiguration{})
 
 	assert.Contains(t, err.Error(), "error modifying commit message")
 }
@@ -55,7 +56,7 @@ func TestRewriteCommitMessage_ErrorCase_CannotWriteMessageToFile(t *testing.T) {
 	commitMessageIsModified(t)
 	cannotWriteToFile(t)
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, config.ProjectConfiguration{})
 
 	assert.Contains(t, err.Error(), "error writing commit message to")
 }
@@ -67,7 +68,7 @@ func TestRewriteCommitMessage_HappyPath(t *testing.T) {
 	commitMessageIsModified(t)
 	commitMessageIsWrittenToFile(t)
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, config.ProjectConfiguration{})
 
 	assert.NoError(t, err)
 }
@@ -107,14 +108,14 @@ func commitMessageFileCannotBeFound(t *testing.T) {
 }
 
 func errorModifyingCommitMessage(t *testing.T) {
-	modifyFunc = func(message string) (string, error) {
+	modifyFunc = func(message string, configuration config.ProjectConfiguration) (string, error) {
 		assert.Exactly(t, commitMessage, message)
 		return "", errors.New("error modifying")
 	}
 }
 
 func commitMessageIsModified(t *testing.T) {
-	modifyFunc = func(message string) (string, error) {
+	modifyFunc = func(message string, configuration config.ProjectConfiguration) (string, error) {
 		assert.Exactly(t, commitMessage, message)
 		return modifiedCommitMessage, nil
 	}

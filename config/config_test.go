@@ -2,8 +2,37 @@ package config
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
+
+func TestGetBranchType(t *testing.T) {
+
+	testDataSet := []struct{ BranchName, ExpectedBranchType string }{
+		{BranchName: "FEATURE-123", ExpectedBranchType: "feature"},
+		{BranchName: "noissue_fix_something", ExpectedBranchType: "feature"},
+		{BranchName: "release/v1.0.0", ExpectedBranchType: "release"},
+		{BranchName: "release/v1.0.0-fix", ExpectedBranchType: "release"},
+		{BranchName: "master", ExpectedBranchType: ""},
+		{BranchName: "develop", ExpectedBranchType: ""},
+	}
+
+	for k, testData := range testDataSet {
+		t.Run(string(k), func(t *testing.T) {
+
+			cfg := &ProjectConfiguration{
+				BranchTypes: map[string]BranchTypeConfiguration{
+					"feature": {Pattern: `(?m)^()((?!master|release|develop).)*$`},
+					"release": {Pattern: `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`},
+				},
+			}
+
+			branchType := cfg.GetBranchType(testData.BranchName)
+
+			assert.Exactly(t, testData.ExpectedBranchType, branchType)
+		})
+	}
+}
 
 func TestGetProjectConfiguration(t *testing.T) {
 	expectedProjectCfg := ProjectConfiguration{Path: "/home/project123"}
@@ -40,6 +69,9 @@ func TestRenderCommitMessage(t *testing.T) {
 		CommitMessage: "initial commit",
 	}
 	cfg := &ProjectConfiguration{
+		BranchTypes: map[string]BranchTypeConfiguration{
+			"feature": {Pattern: `(?m)^()((?!master|release|develop).)*$`},
+		},
 		Templates: map[string]BranchTemplateConfiguration{
 			"feature": {Template: "{{.BranchName}}: {{.CommitMessage}}"},
 		}}
@@ -57,6 +89,9 @@ func TestRenderCommitMessage_InvalidTemplate_ReturnsError(t *testing.T) {
 	configBranchName := "feature"
 	viewModel := ViewModel{}
 	cfg := &ProjectConfiguration{
+		BranchTypes: map[string]BranchTypeConfiguration{
+			"feature": {Pattern: `(?m)^()((?!master|release|develop).)*$`},
+		},
 		Templates: map[string]BranchTemplateConfiguration{
 			"feature": {Template: "{{{{{ HELLO"},
 		}}
@@ -84,4 +119,74 @@ func TestGetTemplate(t *testing.T) {
 
 	template = cfg.GetTemplate("branch0")
 	assert.Exactly(t, "fallback", template)
+}
+
+func TestValidate(t *testing.T) {
+
+	testDataSet := []struct {
+		BranchName    string
+		CommitMessage string
+		ErrorContains string
+	}{
+		{
+			BranchName:    "branch1",
+			CommitMessage: "commit message that contains A.",
+			ErrorContains: "",
+		},
+		{
+			BranchName:    "branch1",
+			CommitMessage: "commit message that contains B.",
+			ErrorContains: "",
+		},
+		{
+			BranchName:    "branch2",
+			CommitMessage: "commit message that contains A.",
+			ErrorContains: "",
+		},
+		{
+			BranchName:    "branch2",
+			CommitMessage: "commit message that contains B.",
+			ErrorContains: "",
+		},
+		{
+			BranchName:    "branch3",
+			CommitMessage: "does not matter what this contains, since there are no validator for branch3",
+			ErrorContains: "",
+		},
+		{
+			BranchName:    "branch1",
+			CommitMessage: "commit message that contains Z.",
+			ErrorContains: "validation error for branch 'branch1'",
+		},
+	}
+
+	for testName, testData := range testDataSet {
+		t.Run(string(testName), func(t *testing.T) {
+
+			cfg := &ProjectConfiguration{
+				BranchTypes: map[string]BranchTypeConfiguration{
+					"branch1": {Pattern: `^branch1$`},
+					"branch2": {Pattern: `^branch2$`},
+					"branch3": {Pattern: `^branch3$`},
+				},
+				Validation: map[string]BranchValidationConfiguration{
+					"branch1": map[string]string{
+						"(A)": "contains B",
+						"(B)": "contains A",
+					},
+					"branch2": map[string]string{
+						"([AB])": "contains A or B (one or multiple)",
+					},
+					"branch3": map[string]string{},
+				},
+			}
+
+			err := cfg.Validate(testData.BranchName, testData.CommitMessage)
+			if testData.ErrorContains != "" {
+				assert.Contains(t, err.Error(), testData.ErrorContains)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
