@@ -124,10 +124,6 @@ func TestDefaultGitBranchNameReaderFunc(t *testing.T) {
 	assert.Exactly(t, reflect.ValueOf(git.GetCurrentBranchName).Pointer(), reflect.ValueOf(gitBranchNameReaderFunc).Pointer())
 }
 
-func TestDefaultFeatureBranchDetectFunc(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(IsFeatureBranch).Pointer(), reflect.ValueOf(featureBranchDetectFunc).Pointer())
-}
-
 func branchNameWillBe(s string) {
 	gitBranchNameReaderFunc = func() (string, error) { return s, nil }
 }

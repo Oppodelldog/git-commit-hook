@@ -10,26 +10,38 @@ import (
 )
 
 type (
+	// Configuration is the data representation of the config file structure
 	Configuration map[string]ProjectConfiguration
 
+	// ProjectConfiguration defined a project related section of the Configuration
 	ProjectConfiguration struct {
-		Path        string                                   `yaml:"path"`
-		BranchTypes map[string]BranchTypeConfiguration       `yaml:"branch"`
-		Templates   map[string]BranchTemplateConfiguration   `yaml:"template"`
-		Validation  map[string]BranchValidationConfiguration `yaml:"validation"`
+		// Path to the git repository this configuration should be used while committing
+		Path string `yaml:"path"`
+		// BranchTypes is a map whose key defines a BranchType - it's value holds a pattern that identifies
+		// a given branch name to be of that branch type.
+		BranchTypes map[string]BranchTypeConfiguration `yaml:"branch"`
+		// Templates is a map whose key refers a branchType - it's value holds a go template that will render the commit message
+		Templates map[string]BranchTemplateConfiguration `yaml:"template"`
+		// Validation is a map whose key refers a branchType - it's value holds configuration to validate the created commit message
+		Validation map[string]BranchValidationConfiguration `yaml:"validation"`
 	}
 
-	BranchValidationConfiguration map[string]string
-
+	// BranchTemplateConfiguration holds a go template that defined the modified commit message
 	BranchTemplateConfiguration struct {
 		Template string `yaml:"template"`
 	}
 
+	// BranchTypeConfiguration holds a pattern that identifies a branch type
 	BranchTypeConfiguration struct {
 		Pattern string `yaml:"matcher"`
 	}
+
+	// BranchValidationConfiguration holds a regex pattern in the index and a test description in the value of the map
+	// The pattern will be tested against a prepared commit message.
+	BranchValidationConfiguration map[string]string
 )
 
+// GetProjectConfiguration returns a ProjectConfiguration for the given git repository path
 func (configuration *Configuration) GetProjectConfiguration(path string) (ProjectConfiguration, error) {
 	for _, projectCfg := range *configuration {
 		if projectCfg.Path == path {
@@ -40,11 +52,13 @@ func (configuration *Configuration) GetProjectConfiguration(path string) (Projec
 	return ProjectConfiguration{}, fmt.Errorf("project configuration not found for path %s", path)
 }
 
+// ViewModel defines all variables that can be in templates to define the modified commit message
 type ViewModel struct {
 	BranchName    string
 	CommitMessage string
 }
 
+// GetBranchType returns a branch type for the given branch name or empty string if no branch type was found.
 func (projConf *ProjectConfiguration) GetBranchType(branchName string) string {
 
 	for branchType, matcher := range projConf.BranchTypes {
@@ -60,9 +74,10 @@ func regexMatchesString(pattern string, branchName string) bool {
 	return pcre.MustCompile(pattern, 0).MatcherString(branchName, 0).Matches()
 }
 
+// RenderCommitMessage renders a commit message using the template defined for the given branchName
 func (projConf *ProjectConfiguration) RenderCommitMessage(branchName string, viewModel ViewModel) (string, error) {
 	branchType := projConf.GetBranchType(branchName)
-	commitMessageTemplate := projConf.GetTemplate(branchType)
+	commitMessageTemplate := projConf.getTemplate(branchType)
 	tmpl, err := template.New("commitMessageTemplate").Parse(commitMessageTemplate)
 	if err != nil {
 		return "", err
@@ -73,7 +88,7 @@ func (projConf *ProjectConfiguration) RenderCommitMessage(branchName string, vie
 	return buffer.String(), err
 }
 
-func (projConf *ProjectConfiguration) GetTemplate(branchType string) string {
+func (projConf *ProjectConfiguration) getTemplate(branchType string) string {
 	foundTemplate := ""
 	for configBranchName, branchTemplateCfg := range projConf.Templates {
 		if configBranchName == branchType || configBranchName == "*" && foundTemplate == "" {
@@ -95,11 +110,13 @@ func (projConf *ProjectConfiguration) getValidators(branchType string) map[strin
 	return foundValidators
 }
 
+// Validate validates the given commitMessage. It uses the validations configured for the given branchName.
+// As soon as one validation check succeeds, the validation passes.
 func (projConf *ProjectConfiguration) Validate(branchName string, commitMessage string) error {
 
 	branchType := projConf.GetBranchType(branchName)
 	validators := projConf.getValidators(branchType)
-	if validators == nil || len(validators) == 0 {
+	if len(validators) == 0 {
 		return nil
 	}
 

@@ -4,6 +4,7 @@ import (
 	"github.com/Oppodelldog/filediscovery"
 )
 
+//LoadConfiguration loads the git-commit-hook configuration from file.
 func LoadConfiguration() (*Configuration, error) {
 	const commitHookConfig = "git-commit-hook.yaml"
 
@@ -19,5 +20,5 @@ func LoadConfiguration() (*Configuration, error) {
 		return nil, err
 	}
 
-	return Parse(filePath)
+	return parse(filePath)
 }

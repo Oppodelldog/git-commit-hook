@@ -7,9 +7,7 @@ import (
 )
 
 type gitBranchNameReaderFuncDef func() (string, error)
-type featureBranchDetectFuncDef func(string) bool
 
-var featureBranchDetectFunc = featureBranchDetectFuncDef(IsFeatureBranch)
 var gitBranchNameReaderFunc = gitBranchNameReaderFuncDef(git.GetCurrentBranchName)
 
 //ModifyGitCommitMessage prepends the current branch name to the given git commit message.

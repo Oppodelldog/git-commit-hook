@@ -111,13 +111,13 @@ func TestGetTemplate(t *testing.T) {
 		},
 	}
 
-	template := cfg.GetTemplate("branch2")
+	template := cfg.getTemplate("branch2")
 	assert.Exactly(t, "templ2", template)
 
-	template = cfg.GetTemplate("branch4")
+	template = cfg.getTemplate("branch4")
 	assert.Exactly(t, "templ4", template)
 
-	template = cfg.GetTemplate("branch0")
+	template = cfg.getTemplate("branch0")
 	assert.Exactly(t, "fallback", template)
 }
 

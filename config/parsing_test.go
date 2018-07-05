@@ -7,9 +7,9 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	config, err := Parse("test-data.yaml")
+	config, err := parse("test-data.yaml")
 	if err != nil {
-		t.Fatalf("Did not expect Parse to return an error, but got: %v ", err)
+		t.Fatalf("Did not expect parse to return an error, but got: %v ", err)
 	}
 
 	expectedConfig := &Configuration{
@@ -50,11 +50,11 @@ func TestParse(t *testing.T) {
 }
 
 func TestParse_InvalidTestData_ExpectUnmarshalError(t *testing.T) {
-	_, err := Parse("test-data-invalid.yaml")
+	_, err := parse("test-data-invalid.yaml")
 	assert.Contains(t, err.Error(), "yaml: unmarshal errors")
 }
 
 func TestParse_FileNotFound_ExpectFileNotFoundError(t *testing.T) {
-	_, err := Parse("test-data-which-does-not-exist.yaml")
+	_, err := parse("test-data-which-does-not-exist.yaml")
 	assert.Contains(t, err.Error(), "no such file or directory")
 }

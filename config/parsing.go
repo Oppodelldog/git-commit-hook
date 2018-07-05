@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Parse(filepath string) (*Configuration, error) {
+func parse(filepath string) (*Configuration, error) {
 	fileContent, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, err
