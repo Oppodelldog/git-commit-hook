@@ -1,10 +1,11 @@
 package gitcommithook
 
 import (
+	"strings"
+
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/git"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 type gitBranchNameReaderFuncDef func() (string, error)
