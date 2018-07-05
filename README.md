@@ -1,24 +1,44 @@
-# git-commit-hook
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/Oppodelldog/git-commit-hook)](https://goreportcard.com/report/github.com/Oppodelldog/git-commit-hook) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/Oppodelldog/git-commit-hook/master/LICENSE) [![Linux build](http://nulldog.de:12080/api/badges/Oppodelldog/git-commit-hook/status.svg)](http://nulldog.de:12080/Oppodelldog/git-commit-hook) [![Windows build](https://ci.appveyor.com/api/projects/status/qpe2889fbk1bw7lf/branch/master?svg=true)](https://ci.appveyor.com/project/Oppodelldog/git-commit-hook/branch/master) [![Coverage Status](https://coveralls.io/repos/github/Oppodelldog/git-commit-hook/badge.svg?branch=master)](https://coveralls.io/github/Oppodelldog/git-commit-hook?branch=master)
 
-**Problem:** I forget to add ticket numbers to commit messages or I take the wrong ticket ID.
+# git-commit-hook
+> configureable git commit hook
 
-**Solution:** a custom git-hook that prepends the current branch-name to every commit message.
 
-The implementation and rules are tightly coupled to **git flow** used with **jira**.
+**Customize commit messages dynamically with templating**
 
-The intention is on the one hand to make life easier when working on features.
-On the other hand the intention must be to not allow commits to non-fetaure branches without having a valid ticket reference.
+**Validate commit message**
 
-### So here are the rules
+### 1. install
+#### Download
+downlod the binary and ensure your user has execution permissions
+#### install
+Copy or link the binary into your git repositories ```hooks``` folder
+(Project/.git/hooks), rename it to ```commit-msg```
 
-* At least there must always be a non empty commit message.
+Or create a symlink:
+```ln -sf ~/Downloads/git-commit-hook ~/MyProject/.git/hooks/commit-msg```
 
-* When you are committing to a **feature** branch
+### 2. Configure
+```yaml
+ "project xyz":
+   # path to the git repository
+   path: "/home/nils/projects/xyz/.git"
 
-        the hook will preprend the branch name to the commit message
+   # define types of branch and a pattern to identify the type for the current branch you are working on
+   branch:
+      master: "^(origin\\/)*master"
 
-* When you are committing to a non feature branch, lets say **develop** for a quick fix, **release/v0.1.1** for a release fix or a **hotfix**
+   # define a commit message template per branch type, or as here for all (*) branch types
+   # templates for defined branch types are taken in advance of * template
+   template:
+     "*": "{.BranchName}: {.CommitMessage}"
 
-        you have to enter a valid feature reference.
+   # define validation rules per branch type
+   validation:
+      master:
+        "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+ ```
+ Watch out the test [fixture](config/test-data.yaml) for full feature sample
+
+### 3. Commit
+You can do it on your own, I know that!!

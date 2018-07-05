@@ -14,7 +14,7 @@ func TestParse(t *testing.T) {
 
 	expectedConfig := &Configuration{
 		"project xyz": {
-			Path: "/home/nils/projects/xyz",
+			Path: "/home/nils/projects/xyz/.git",
 			BranchTypes: map[string]BranchTypePattern{
 				"master":  `^(origin\/)*master`,
 				"feature": `^((?!master|release|develop).)*$`,
