@@ -26,17 +26,20 @@ const commitMessageFile = ".git/COMMIT_EDITMSG"
 var originals = struct {
 	osArgs                   []string
 	rewriteCommitMessageFunc rewriteCommitMessageFuncDef
+	diagnosticsFunc          diagnosticsFuncDef
 	exitFunc                 exitFuncDef
 	osStdout                 *os.File
 }{
-	osArgs: os.Args,
+	osArgs:                   os.Args,
 	rewriteCommitMessageFunc: rewriteCommitMessageFunc,
+	diagnosticsFunc:          diagnosticsFunc,
 	exitFunc:                 exitFunc,
 	osStdout:                 os.Stdout,
 }
 
 //restoreOriginals restores original values
 func restoreOriginals() {
+	diagnosticsFunc = originals.diagnosticsFunc
 	os.Args = originals.osArgs
 	rewriteCommitMessageFunc = originals.rewriteCommitMessageFunc
 	exitFunc = originals.exitFunc
@@ -78,7 +81,7 @@ func TestMain_ConfigurationNotFound(t *testing.T) {
 	w.Close()
 
 	stdOutput := <-stdOutChannel
-	assert.Contains(t, stdOutput, "could not find config file")
+	assert.Contains(t, stdOutput, "project configuration not found for path")
 	assertCommitMessage(t, initialCommitMessage)
 }
 
@@ -107,20 +110,22 @@ func TestMain_ErrorCase_TooFewArguments(t *testing.T) {
 
 	testDataSet := map[string]struct{ OsArgs []string }{
 		"no cli argument":  {[]string{}},
-		"one cli argument": {[]string{"dummy-input"}},
+		"one cli argument": {[]string{"fyi: in runtime this will be the filepath to the command itself"}},
 	}
 
 	for testCaseName, testData := range testDataSet {
 		t.Run(testCaseName, func(t *testing.T) {
-
 			os.Args = testData.OsArgs
-			w, stdOutChannel := captureStdOut(t)
+
+			diagnosticsFuncCalled := false
+			diagnosticsFunc = func() int {
+				diagnosticsFuncCalled = true
+				return 1
+			}
 			assertProgramExistsWith(t, 1)
 			main()
-			w.Close()
-			stdOutput := <-stdOutChannel
-			assert.Contains(t, stdOutput, "no input provided")
 
+			assert.True(t, diagnosticsFuncCalled)
 		})
 	}
 }

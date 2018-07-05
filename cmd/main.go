@@ -3,25 +3,26 @@ package main
 import (
 	"os"
 
-	"path/filepath"
-
 	"fmt"
 
 	"github.com/Oppodelldog/git-commit-hook"
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/pkg/errors"
+	"github.com/Oppodelldog/git-commit-hook/cmd/diag"
 )
 
+type diagnosticsFuncDef func() int
 type rewriteCommitMessageFuncDef func(string, config.ProjectConfiguration) error
 type exitFuncDef func(code int)
 
+var diagnosticsFunc = diag.SubCommandDiagnostics
 var rewriteCommitMessageFunc = rewriteCommitMessageFuncDef(gitcommithook.RewriteCommitMessage)
 var exitFunc = exitFuncDef(os.Exit)
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Print(errors.New("no input provided"))
-		exitFunc(1)
+		result := diagnosticsFunc()
+		exitFunc(result)
 		return
 	}
 
@@ -32,7 +33,7 @@ func main() {
 		return
 	}
 
-	projectConfiguration, err := loadProjectConfiguration(commitMessageFile)
+	projectConfiguration, err := config.LoadProjectConfiguration(commitMessageFile)
 	if err != nil {
 		fmt.Print(err)
 		exitFunc(1)
@@ -47,19 +48,4 @@ func main() {
 	}
 
 	exitFunc(0)
-}
-
-func loadProjectConfiguration(commitMessageFile string) (config.ProjectConfiguration, error) {
-
-	configuration, err := config.LoadConfiguration()
-	if err != nil {
-		return config.ProjectConfiguration{}, err
-	}
-
-	projectPath, err := filepath.Abs(filepath.Dir(commitMessageFile))
-	if err != nil {
-		return config.ProjectConfiguration{}, err
-	}
-
-	return configuration.GetProjectConfiguration(projectPath)
 }

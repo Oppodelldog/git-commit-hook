@@ -11,7 +11,7 @@
 ### 1. install
 #### Download
 downlod the binary and ensure your user has execution permissions
-#### install
+#### Install
 Copy or link the binary into your git repositories ```hooks``` folder
 (Project/.git/hooks), rename it to ```commit-msg```
 
@@ -29,7 +29,6 @@ Or create a symlink:
       master: "^(origin\\/)*master"
 
    # define a commit message template per branch type, or as here for all (*) branch types
-   # templates for defined branch types are taken in advance of * template
    template:
      "*": "{.BranchName}: {.CommitMessage}"
 
@@ -38,7 +37,36 @@ Or create a symlink:
       master:
         "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
  ```
- Watch out the test [fixture](config/test-data.yaml) for full feature sample
+ There are several places the configuration will be searched at, but one thing is for sure, the config file
+ must be named ```git-commit-hook.yaml```.
+
+ Here are some places the configuration will be searched at:
+ * **~/.config/git-commit-hook**
+ * inside the **git repository** you commit in (also in subfolders **.git**, **.git/hooks**)
+
+Watch out the test [fixture](config/test-data.yaml) for full feature sample
 
 ### 3. Commit
 You can do it on your own, I know that!!
+
+---
+
+### Configuration check
+to check if the git hook is installed and configured correctly, just call the command from
+your repository like this:
+```.git/hooks/commit-msg```
+
+The output will be something like this:
+
+    git-commit-hook - parsed configuration
+
+
+    branch types:
+         master : ^(origin\/)*master
+
+    branch type templates:
+         master : {{.CommitMessage}} - whatever !!! {{.BranchName}}
+
+    branch type validation:
+         master :
+             (?m)^.*(#\d*)+.*$ : must have a ticket reference (eg. #267)
