@@ -21,9 +21,9 @@ func TestGetBranchType(t *testing.T) {
 		t.Run(string(k), func(t *testing.T) {
 
 			cfg := &ProjectConfiguration{
-				BranchTypes: map[string]BranchTypeConfiguration{
-					"feature": {Pattern: `(?m)^()((?!master|release|develop).)*$`},
-					"release": {Pattern: `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`},
+				BranchTypes: map[string]BranchTypePattern{
+					"feature": `(?m)^()((?!master|release|develop).)*$`,
+					"release": `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`,
 				},
 			}
 
@@ -69,11 +69,11 @@ func TestRenderCommitMessage(t *testing.T) {
 		CommitMessage: "initial commit",
 	}
 	cfg := &ProjectConfiguration{
-		BranchTypes: map[string]BranchTypeConfiguration{
-			"feature": {Pattern: `(?m)^()((?!master|release|develop).)*$`},
+		BranchTypes: map[string]BranchTypePattern{
+			"feature": `(?m)^()((?!master|release|develop).)*$`,
 		},
-		Templates: map[string]BranchTemplateConfiguration{
-			"feature": {Template: "{{.BranchName}}: {{.CommitMessage}}"},
+		Templates: map[string]BranchTypeTemplate{
+			"feature": "{{.BranchName}}: {{.CommitMessage}}",
 		}}
 
 	modifiedCommitMessage, err := cfg.RenderCommitMessage(configBranchName, viewModel)
@@ -89,11 +89,11 @@ func TestRenderCommitMessage_InvalidTemplate_ReturnsError(t *testing.T) {
 	configBranchName := "feature"
 	viewModel := ViewModel{}
 	cfg := &ProjectConfiguration{
-		BranchTypes: map[string]BranchTypeConfiguration{
-			"feature": {Pattern: `(?m)^()((?!master|release|develop).)*$`},
+		BranchTypes: map[string]BranchTypePattern{
+			"feature": `(?m)^()((?!master|release|develop).)*$`,
 		},
-		Templates: map[string]BranchTemplateConfiguration{
-			"feature": {Template: "{{{{{ HELLO"},
+		Templates: map[string]BranchTypeTemplate{
+			"feature": "{{{{{ HELLO",
 		}}
 
 	_, err := cfg.RenderCommitMessage(configBranchName, viewModel)
@@ -103,11 +103,11 @@ func TestRenderCommitMessage_InvalidTemplate_ReturnsError(t *testing.T) {
 
 func TestGetTemplate(t *testing.T) {
 	cfg := &ProjectConfiguration{
-		Templates: map[string]BranchTemplateConfiguration{
-			"branch1": {Template: "templ1"},
-			"branch2": {Template: "templ2"},
-			"*":       {Template: "fallback"},
-			"branch4": {Template: "templ4"},
+		Templates: map[string]BranchTypeTemplate{
+			"branch1": "templ1",
+			"branch2": "templ2",
+			"*":       "fallback",
+			"branch4": "templ4",
 		},
 	}
 
@@ -164,10 +164,10 @@ func TestValidate(t *testing.T) {
 		t.Run(string(testName), func(t *testing.T) {
 
 			cfg := &ProjectConfiguration{
-				BranchTypes: map[string]BranchTypeConfiguration{
-					"branch1": {Pattern: `^branch1$`},
-					"branch2": {Pattern: `^branch2$`},
-					"branch3": {Pattern: `^branch3$`},
+				BranchTypes: map[string]BranchTypePattern{
+					"branch1": `^branch1$`,
+					"branch2": `^branch2$`,
+					"branch3": `^branch3$`,
 				},
 				Validation: map[string]BranchValidationConfiguration{
 					"branch1": map[string]string{

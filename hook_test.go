@@ -74,13 +74,13 @@ func TestModifyGitCommitMessage(t *testing.T) {
 	}
 
 	prjCfg := config.ProjectConfiguration{
-		BranchTypes: map[string]config.BranchTypeConfiguration{
-			"feature": {Pattern: `(?m)^((?!master|release|develop).)*$`},
-			"release": {Pattern: `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`},
+		BranchTypes: map[string]config.BranchTypePattern{
+			"feature": `(?m)^((?!master|release|develop).)*$`,
+			"release": `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`,
 		},
-		Templates: map[string]config.BranchTemplateConfiguration{
-			"feature": {Template: "{{.BranchName}}: {{.CommitMessage}}"},
-			"release": {Template: "{{.BranchName}}: {{.CommitMessage}}"},
+		Templates: map[string]config.BranchTypeTemplate{
+			"feature": "{{.BranchName}}: {{.CommitMessage}}",
+			"release": "{{.BranchName}}: {{.CommitMessage}}",
 		},
 		Validation: map[string]config.BranchValidationConfiguration{
 			"release": {
@@ -122,6 +122,18 @@ func TestModifyGitCommitMessage_branchNameReaderReturnsError_ExpectError(t *test
 
 func TestDefaultGitBranchNameReaderFunc(t *testing.T) {
 	assert.Exactly(t, reflect.ValueOf(git.GetCurrentBranchName).Pointer(), reflect.ValueOf(gitBranchNameReaderFunc).Pointer())
+}
+
+func TestCreateViewModel_TrimsWhiteSpacesFromCommitMessage(t *testing.T) {
+	commitMessage := "\t\tHELLO\n\tWORLD\n\r\t"
+	branchName := "branchName"
+	viewModel := createViewModel(commitMessage, branchName)
+
+	expectedViewModel := config.ViewModel{
+		CommitMessage: "HELLO\n\tWORLD",
+		BranchName:    "branchName",
+	}
+	assert.Exactly(t, expectedViewModel, viewModel)
 }
 
 func branchNameWillBe(s string) {

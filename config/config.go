@@ -19,22 +19,18 @@ type (
 		Path string `yaml:"path"`
 		// BranchTypes is a map whose key defines a BranchType - it's value holds a pattern that identifies
 		// a given branch name to be of that branch type.
-		BranchTypes map[string]BranchTypeConfiguration `yaml:"branch"`
+		BranchTypes map[string]BranchTypePattern `yaml:"branch"`
 		// Templates is a map whose key refers a branchType - it's value holds a go template that will render the commit message
-		Templates map[string]BranchTemplateConfiguration `yaml:"template"`
+		Templates map[string]BranchTypeTemplate `yaml:"template"`
 		// Validation is a map whose key refers a branchType - it's value holds configuration to validate the created commit message
 		Validation map[string]BranchValidationConfiguration `yaml:"validation"`
 	}
 
-	// BranchTemplateConfiguration holds a go template that defined the modified commit message
-	BranchTemplateConfiguration struct {
-		Template string `yaml:"template"`
-	}
+	// BranchTypeTemplate holds a go template that defined the modified commit message
+	BranchTypeTemplate string
 
-	// BranchTypeConfiguration holds a pattern that identifies a branch type
-	BranchTypeConfiguration struct {
-		Pattern string `yaml:"matcher"`
-	}
+	// BranchTypePattern defines a regex pattern that identifies a branch type
+	BranchTypePattern string
 
 	// BranchValidationConfiguration holds a regex pattern in the index and a test description in the value of the map
 	// The pattern will be tested against a prepared commit message.
@@ -61,8 +57,8 @@ type ViewModel struct {
 // GetBranchType returns a branch type for the given branch name or empty string if no branch type was found.
 func (projConf *ProjectConfiguration) GetBranchType(branchName string) string {
 
-	for branchType, matcher := range projConf.BranchTypes {
-		if regexMatchesString(matcher.Pattern, branchName) {
+	for branchType, branchTypePattern := range projConf.BranchTypes {
+		if regexMatchesString(string(branchTypePattern), branchName) {
 			return branchType
 		}
 	}
@@ -90,9 +86,9 @@ func (projConf *ProjectConfiguration) RenderCommitMessage(branchName string, vie
 
 func (projConf *ProjectConfiguration) getTemplate(branchType string) string {
 	foundTemplate := ""
-	for configBranchName, branchTemplateCfg := range projConf.Templates {
-		if configBranchName == branchType || configBranchName == "*" && foundTemplate == "" {
-			foundTemplate = branchTemplateCfg.Template
+	for configBranchType, branchTypeTemplate := range projConf.Templates {
+		if configBranchType == branchType || configBranchType == "*" && foundTemplate == "" {
+			foundTemplate = string(branchTypeTemplate)
 		}
 	}
 
@@ -136,6 +132,7 @@ func prepareError(branchName string, validators map[string]string) error {
 	buffer.WriteString("at least expected one of the following to match\n")
 
 	for _, validationDescription := range validators {
+		buffer.WriteString(" - ")
 		buffer.WriteString(validationDescription)
 		buffer.WriteString("\n")
 	}

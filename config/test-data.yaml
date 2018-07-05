@@ -1,20 +1,14 @@
 "project xyz":
   path: "/home/nils/projects/xyz"
   branch:
-     master:
-       matcher: "^(origin\\/)*master"
-     feature:
-       matcher: "^((?!master|release|develop).)*$"
-     develop:
-       matcher: "^(origin\\/)*develop$"
-     release:
-       matcher: "^(origin\\/)*release\\/v([0-9]*\\.*)*$"
-     hotfix:
-       matcher: "^(origin\\/)*hotfix\\/v([0-9]*\\.*)*$"
+     master: "^(origin\\/)*master"
+     feature: "^((?!master|release|develop).)*$"
+     develop: "^(origin\\/)*develop$"
+     release: "^(origin\\/)*release\\/v([0-9]*\\.*)*$"
+     hotfix: "^(origin\\/)*hotfix\\/v([0-9]*\\.*)*$"
 
   template:
-    "*":
-      template: "{.BranchName}: {.CommitMessage}"
+    "*": "{.BranchName}: {.CommitMessage}"
 
   validation:
      feature:

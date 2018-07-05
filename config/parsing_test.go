@@ -15,15 +15,15 @@ func TestParse(t *testing.T) {
 	expectedConfig := &Configuration{
 		"project xyz": {
 			Path: "/home/nils/projects/xyz",
-			BranchTypes: map[string]BranchTypeConfiguration{
-				"master":  {Pattern: `^(origin\/)*master`},
-				"feature": {Pattern: `^((?!master|release|develop).)*$`},
-				"develop": {Pattern: `^(origin\/)*develop$`},
-				"release": {Pattern: `^(origin\/)*release\/v([0-9]*\.*)*$`},
-				"hotfix":  {Pattern: `^(origin\/)*hotfix\/v([0-9]*\.*)*$`},
+			BranchTypes: map[string]BranchTypePattern{
+				"master":  `^(origin\/)*master`,
+				"feature": `^((?!master|release|develop).)*$`,
+				"develop": `^(origin\/)*develop$`,
+				"release": `^(origin\/)*release\/v([0-9]*\.*)*$`,
+				"hotfix":  `^(origin\/)*hotfix\/v([0-9]*\.*)*$`,
 			},
-			Templates: map[string]BranchTemplateConfiguration{
-				"*": {Template: `{.BranchName}: {.CommitMessage}`},
+			Templates: map[string]BranchTypeTemplate{
+				"*": `{.BranchName}: {.CommitMessage}`,
 			},
 			Validation: map[string]BranchValidationConfiguration{
 				"feature": {

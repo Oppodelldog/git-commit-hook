@@ -4,6 +4,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/git"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 type gitBranchNameReaderFuncDef func() (string, error)
@@ -46,7 +47,8 @@ func ModifyGitCommitMessage(gitCommitMessage string, projectConfiguration config
 }
 
 func createViewModel(gitCommitMessage string, branchName string) config.ViewModel {
-	viewModel := config.ViewModel{CommitMessage: gitCommitMessage, BranchName: branchName}
+	trimmedCommitMessage := strings.Trim(gitCommitMessage, " \t\r\n")
+	viewModel := config.ViewModel{CommitMessage: trimmedCommitMessage, BranchName: branchName}
 
 	return viewModel
 }
