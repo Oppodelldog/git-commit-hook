@@ -32,24 +32,20 @@ func GetCurrentBranchName() (string, error) {
 
 func getBranchNameFromGitOutput(gitOutput string) string {
 
-	var re = regexp.MustCompile(`(?m)^\* (.*)$`)
-
-	matches := re.FindAllStringSubmatch(gitOutput, 1)
-
-	if len(matches) > 0 {
-		if len(matches[0]) > 1 {
-			return matches[0][1]
-		}
-	}
-
-	return ""
+	return extractFromString(gitOutput, `(?m)^\* (.*)$`)
 }
 
 func getBranchNameFromGitLogOutput(gitOutput string) string {
 	// https://github.com/git/git/blob/ed843436dd4924c10669820cc73daf50f0b4dabd/revision.c#L2303
-	var re = regexp.MustCompile(`(?m)^fatal: your current branch '(.*)' does not have any commits yet$`)
+	pattern := `(?m)^fatal: your current branch '(.*)' does not have any commits yet$`
 
-	matches := re.FindAllStringSubmatch(gitOutput, 1)
+	return extractFromString(gitOutput, pattern)
+}
+
+func extractFromString(s, regexPattern string) string {
+	var re = regexp.MustCompile(regexPattern)
+
+	matches := re.FindAllStringSubmatch(s, 1)
 
 	if len(matches) > 0 {
 		if len(matches[0]) > 1 {

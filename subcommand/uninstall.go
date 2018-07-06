@@ -1,4 +1,4 @@
-package diag
+package subcommand
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+// Uninstall subcommand uninstalls the git-commit-hook from configured git repositories
 func Uninstall() int {
 	var projectName string
 	var allFlag bool
@@ -28,7 +29,7 @@ func Uninstall() int {
 	}
 
 	if projectName != "" {
-		projectConfiguraiton, err := configuration.GetProjectConfigurationByName(projectName)
+		projectConfiguraiton, err := configuration.GetProjectByName(projectName)
 		if err != nil {
 			fmt.Println(err)
 			return 1

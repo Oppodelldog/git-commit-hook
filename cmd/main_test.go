@@ -12,8 +12,8 @@ import (
 
 	"path"
 
-	"github.com/Oppodelldog/git-commit-hook/cmd/diag"
 	"github.com/Oppodelldog/git-commit-hook/config"
+	"github.com/Oppodelldog/git-commit-hook/subcommand"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
@@ -91,7 +91,7 @@ func TestMain_ConfigurationNotFound(t *testing.T) {
 	w.Close()
 
 	stdOutput := <-stdOutChannel
-	assert.Contains(t, stdOutput, "project configuration not found for path")
+	assert.Contains(t, stdOutput, "could not find config file")
 	assertCommitMessage(t, initialCommitMessage)
 }
 
@@ -127,50 +127,48 @@ func TestMain_ErrorCase_TooFewArguments(t *testing.T) {
 		t.Run(testCaseName, func(t *testing.T) {
 			os.Args = testData.OsArgs
 
-			diagnosticsFuncCalled := false
-			diagnosticsFunc = func() int {
-				diagnosticsFuncCalled = true
-				return 1
-			}
-			assertProgramExistsWith(t, 1)
+			assertProgramExistsWith(t, 0)
+			w, stdOutChannel := captureStdOut(t)
+
 			main()
 
-			assert.True(t, diagnosticsFuncCalled)
+			w.Close()
+
+			stdOutput := <-stdOutChannel
+
+			assert.Contains(t, stdOutput, "too few arguments")
 		})
 	}
 }
 
-func TestMain_FirstArgIsTest_TestFuncCalled(t *testing.T) {
+func TestMain_FirstArgIsSubCommand_AppropriateFuncCalled(t *testing.T) {
 	defer restoreOriginals()
 
 	testDataSet := map[string]struct {
-		OsArgs                 []string
-		expectTestFuncIsCalled bool
+		SubCommandName string
+		expectedFunc   *callWithIntResult
 	}{
-		"no cli argument":                  {[]string{}, false},
-		"one cli argument":                 {[]string{"progname"}, false},
-		"two cli arguments commit-message": {[]string{"progname", "commitMessageFile.txt"}, false},
-		"two cli arguments test-mode":      {[]string{"progname", "test"}, true},
+		"test":      {"test", &testFunc},
+		"install":   {"test", &installFunc},
+		"uninstall": {"test", &uninstallFunc},
+		"diag":      {"test", &diagnosticsFunc},
 	}
 
-	for testCaseName, testData := range testDataSet {
-		t.Run(testCaseName, func(t *testing.T) {
-			os.Args = testData.OsArgs
+	for subCommandName, testData := range testDataSet {
+		t.Run(subCommandName, func(t *testing.T) {
+			restoreOriginals()
+			os.Args = []string{"", subCommandName}
 
-			testFuncCalled := false
-			testFunc = func() int {
-				testFuncCalled = true
-				return 1
+			funcStubCalled := false
+			*testData.expectedFunc = func() int {
+				funcStubCalled = true
+				return 0
 			}
-			assertProgramExistsWith(t, 1)
+			exitFunc = func(int) {}
+
 			main()
 
-			if testData.expectTestFuncIsCalled {
-				assert.True(t, testFuncCalled)
-			} else {
-				assert.False(t, testFuncCalled)
-			}
-
+			assert.True(t, funcStubCalled)
 		})
 	}
 }
@@ -232,19 +230,19 @@ func TestMain_ExitFuncUsesAppropriateOsFunc(t *testing.T) {
 }
 
 func TestMain_DiagnoseFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(diag.SubCommandDiagnostics).Pointer(), reflect.ValueOf(diagnosticsFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.Diagnostics).Pointer(), reflect.ValueOf(diagnosticsFunc).Pointer())
 }
 
 func TestMain_TestFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(diag.Test).Pointer(), reflect.ValueOf(testFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.Test).Pointer(), reflect.ValueOf(testFunc).Pointer())
 }
 
 func TestMain_InstallFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(diag.Install).Pointer(), reflect.ValueOf(installFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.Install).Pointer(), reflect.ValueOf(installFunc).Pointer())
 }
 
 func TestMain_UnnstallFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(diag.Uninstall).Pointer(), reflect.ValueOf(uninstallFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.Uninstall).Pointer(), reflect.ValueOf(uninstallFunc).Pointer())
 }
 func assertProgramExistsWith(t *testing.T, expectedExitCode int) {
 	exitFunc = func(exitCode int) {
@@ -311,7 +309,7 @@ func initGitRepository(t *testing.T, branchName string) {
 func writeConfigFile(t *testing.T, dir string) {
 	os.MkdirAll(dir, 0777)
 	cfg := config.Configuration{
-		"test project": config.ProjectConfiguration{
+		"test project": config.Project{
 			Path: "/tmp/git-commit-hook/.git",
 			BranchTypes: map[string]config.BranchTypePattern{
 				"feature": `^feature/PROJECT-123$`,

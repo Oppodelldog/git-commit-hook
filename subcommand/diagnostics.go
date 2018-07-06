@@ -1,4 +1,4 @@
-package diag
+package subcommand
 
 import (
 	"fmt"
@@ -6,7 +6,8 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
-func SubCommandDiagnostics() int {
+// Diagnostics gives useful output about the current configuration
+func Diagnostics() int {
 
 	configurationFilePath, err := config.FindConfigurationFilePath()
 	if err != nil {
@@ -43,7 +44,7 @@ func SubCommandDiagnostics() int {
 	return 1
 }
 
-func printProjectConfiguration(projectName string, projectConfiguration config.ProjectConfiguration) {
+func printProjectConfiguration(projectName string, projectConfiguration config.Project) {
 	fmt.Println("project:", projectName)
 	fmt.Println("path   :", projectConfiguration.Path)
 	fmt.Println("\nbranch types:")

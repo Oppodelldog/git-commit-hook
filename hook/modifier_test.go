@@ -3,26 +3,10 @@ package hook
 import (
 	"testing"
 
-	"reflect"
-
 	"github.com/Oppodelldog/git-commit-hook/config"
-	"github.com/Oppodelldog/git-commit-hook/git"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"errors"
 )
-
-//originals hold a compile time copy of the modules globals
-//this enables stubbing functions or user input
-var originals = struct {
-	gitBranchNameReaderFunc gitBranchNameReaderFuncDef
-}{
-	gitBranchNameReaderFunc: gitBranchNameReaderFunc,
-}
-
-//restoreOriginals resets the modules globals to the original state
-func restoreOriginals() {
-	gitBranchNameReaderFunc = originals.gitBranchNameReaderFunc
-}
 
 func TestModifyGitCommitMessage(t *testing.T) {
 
@@ -62,8 +46,8 @@ func TestModifyGitCommitMessage(t *testing.T) {
 		"commit with broken branch name detection, but with commit message": {
 			input:         "initial commit",
 			branchName:    "",
-			output:        "",
-			errorContains: "branch name is empty",
+			output:        "initial commit",
+			errorContains: "",
 		},
 		"commit with broken branch name detection and without commit message": {
 			input:         "",
@@ -73,7 +57,7 @@ func TestModifyGitCommitMessage(t *testing.T) {
 		},
 	}
 
-	prjCfg := config.ProjectConfiguration{
+	prjCfg := config.Project{
 		BranchTypes: map[string]config.BranchTypePattern{
 			"feature": `(?m)^((?!master|release|develop).)*$`,
 			"release": `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`,
@@ -92,9 +76,8 @@ func TestModifyGitCommitMessage(t *testing.T) {
 	for testName, testData := range testCases {
 
 		t.Run(testName, func(t *testing.T) {
-			branchNameWillBe(testData.branchName)
-
-			modifiedGitCommitMessage, err := ModifyGitCommitMessage(testData.input, prjCfg)
+			modifier := NewCommitMessageModifier(prjCfg)
+			modifiedGitCommitMessage, err := modifier.ModifyGitCommitMessage(testData.input, testData.branchName)
 
 			if testData.errorContains != "" {
 				assert.Contains(t, err.Error(), testData.errorContains)
@@ -102,44 +85,20 @@ func TestModifyGitCommitMessage(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.Exactly(t, testData.output, modifiedGitCommitMessage)
-
-			restoreOriginals()
 		})
 	}
 }
 
-func TestModifyGitCommitMessage_branchNameReaderReturnsError_ExpectError(t *testing.T) {
-	defer restoreOriginals()
+func TestModifyGitCommitMessage_commitMessageRendererReturnsError_ExpectError(t *testing.T) {
 
-	expectedError := errors.New("error while reading branch name")
-
-	branchNameReaderReturnsError(expectedError)
-
-	_, err := ModifyGitCommitMessage("some message", config.ProjectConfiguration{})
-
-	assert.Exactly(t, expectedError, err)
-}
-
-func TestDefaultGitBranchNameReaderFunc(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(git.GetCurrentBranchName).Pointer(), reflect.ValueOf(gitBranchNameReaderFunc).Pointer())
-}
-
-func TestCreateViewModel_TrimsWhiteSpacesFromCommitMessage(t *testing.T) {
-	commitMessage := "\t\tHELLO\n\tWORLD\n\r\t"
-	branchName := "branchName"
-	viewModel := createViewModel(commitMessage, branchName)
-
-	expectedViewModel := config.ViewModel{
-		CommitMessage: "HELLO\n\tWORLD",
-		BranchName:    "branchName",
+	commitMessage := "some message"
+	branchName := "feature123"
+	errStub := errors.New("stubbed renderer error")
+	modifier := NewCommitMessageModifier(config.Project{})
+	modifier.(*commitMessageModifier).renderCommitMessageFunc = func(branchName string, viewModel ViewModel) (string, error) {
+		return "", errStub
 	}
-	assert.Exactly(t, expectedViewModel, viewModel)
-}
+	_, err := modifier.ModifyGitCommitMessage(commitMessage, branchName)
 
-func branchNameWillBe(s string) {
-	gitBranchNameReaderFunc = func() (string, error) { return s, nil }
-}
-
-func branchNameReaderReturnsError(e error) {
-	gitBranchNameReaderFunc = func() (string, error) { return "", e }
+	assert.Exactly(t, errStub, err)
 }

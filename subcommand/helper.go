@@ -1,4 +1,4 @@
-package diag
+package subcommand
 
 import (
 	"fmt"
@@ -10,11 +10,11 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
-func loadProjectConfiguration() (config.ProjectConfiguration, error) {
+func loadProjectConfiguration() (config.Project, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
-		return config.ProjectConfiguration{}, err
+		return config.Project{}, err
 	}
 
 	return config.LoadProjectConfigurationFromCommitMessageFileDir(path.Join(wd, ".git/commit-message.txt"))

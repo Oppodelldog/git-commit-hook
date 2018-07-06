@@ -1,4 +1,4 @@
-package diag
+package subcommand
 
 import (
 	"flag"
@@ -7,8 +7,10 @@ import (
 
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/hook"
+	"github.com/Oppodelldog/git-commit-hook/git"
 )
 
+// Test helps to test configuration against manual input to simulate real commit situations
 func Test() int {
 
 	var commitMessage string
@@ -31,7 +33,7 @@ func Test() int {
 			fmt.Printf("error while searching config file: %v\n", err)
 			return 1
 		}
-		var projectConfiguration config.ProjectConfiguration
+		var projectConfiguration config.Project
 		if projectName != "" {
 			projectConfiguration, err = config.LoadProjectConfigurationByName(projectName)
 		} else {
@@ -53,12 +55,15 @@ func Test() int {
 		fmt.Println()
 
 		var modifiedCommitMessage string
+		commitMessageModifier := hook.NewCommitMessageModifier(projectConfiguration)
 		if branchName != "" {
-			modifiedCommitMessage, err = hook.ModifyGitCommitMessageForCustomBranch(commitMessage, projectConfiguration, func() (string, error) {
-				return branchName, nil
-			})
+			modifiedCommitMessage, err = commitMessageModifier.ModifyGitCommitMessage(commitMessage, branchName)
 		} else {
-			modifiedCommitMessage, err = hook.ModifyGitCommitMessage(commitMessage, projectConfiguration)
+			branchName, err := git.GetCurrentBranchName()
+			if err != nil {
+				fmt.Println("error while reading branch name. ensure working dir is a git repo or use parameter -b to simulate a branch name")
+			}
+			modifiedCommitMessage, err = commitMessageModifier.ModifyGitCommitMessage(commitMessage, branchName)
 		}
 		if err != nil {
 			fmt.Print(err)

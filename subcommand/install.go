@@ -1,4 +1,4 @@
-package diag
+package subcommand
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+// Install subcommand installs the git-commit-hook in configured git repositories
 func Install() int {
 	var projectName string
 	var allFlag bool
@@ -30,7 +31,7 @@ func Install() int {
 	}
 
 	if projectName != "" {
-		projectConfiguraiton, err := configuration.GetProjectConfigurationByName(projectName)
+		projectConfiguraiton, err := configuration.GetProjectByName(projectName)
 		if err != nil {
 			fmt.Println(err)
 			return 1
@@ -78,16 +79,15 @@ func installProject(gitFolderPath string, forceOverwrite bool) error {
 
 	fmt.Printf("installing git-commit-hook to '%s': ", commitHookFilePath)
 
-	if _, err := os.Stat(commitHookFilePath); err == nil {
+	if _, err = os.Stat(commitHookFilePath); err == nil {
 		if !forceOverwrite {
 			fmt.Println("file already exists, use -f to force overwriting")
-			return err
-		} else {
-			err := os.Remove(commitHookFilePath)
-			if err != nil {
-				fmt.Println(err)
-				return nil
-			}
+			return nil
+		}
+		err = os.Remove(commitHookFilePath)
+		if err != nil {
+			fmt.Println(err)
+			return nil
 		}
 	}
 
