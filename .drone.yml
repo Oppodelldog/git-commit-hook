@@ -13,7 +13,7 @@ pipeline:
       - go get ./...
       - go get github.com/mattn/goveralls
       - goveralls -service drone.io -repotoken BddPGJN9lAFBYHLGI5mIHLjZVJlD74n3X
-      - go build
+      - go build cmd/main.go
 
 matrix:
  GO_VERSION:
