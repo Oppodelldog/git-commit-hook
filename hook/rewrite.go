@@ -1,4 +1,4 @@
-package gitcommithook
+package hook
 
 import (
 	"io/ioutil"

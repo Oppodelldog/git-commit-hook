@@ -1,4 +1,4 @@
-package gitcommithook
+package hook
 
 import (
 	"strings"
@@ -45,6 +45,14 @@ func ModifyGitCommitMessage(gitCommitMessage string, projectConfiguration config
 	}
 
 	return
+}
+
+func ModifyGitCommitMessageForCustomBranch(gitCommitMessage string, projectConfiguration config.ProjectConfiguration, branchNameResolver gitBranchNameReaderFuncDef) (modifiedCommitMessage string, err error) {
+	originalGitBranchNameReaderFunc := gitBranchNameReaderFunc
+	defer func() { gitBranchNameReaderFunc = originalGitBranchNameReaderFunc }()
+	gitBranchNameReaderFunc = branchNameResolver
+
+	return ModifyGitCommitMessage(gitCommitMessage, projectConfiguration)
 }
 
 func createViewModel(gitCommitMessage string, branchName string) config.ViewModel {

@@ -45,7 +45,18 @@ func (configuration *Configuration) GetProjectConfiguration(path string) (Projec
 		}
 	}
 
-	return ProjectConfiguration{}, fmt.Errorf("project configuration not found for path %s", path)
+	return ProjectConfiguration{}, fmt.Errorf("project configuration not found for path '%s'", path)
+}
+
+// GetProjectConfigurationByName returns a ProjectConfiguration for the given project name
+func (configuration *Configuration) GetProjectConfigurationByName(projectName string) (ProjectConfiguration, error) {
+	for configProjectName, projectCfg := range *configuration {
+		if configProjectName == projectName {
+			return projectCfg, nil
+		}
+	}
+
+	return ProjectConfiguration{}, fmt.Errorf("project configuration not found for project name '%s'", projectName)
 }
 
 // ViewModel defines all variables that can be in templates to define the modified commit message
@@ -74,6 +85,9 @@ func regexMatchesString(pattern string, branchName string) bool {
 func (projConf *ProjectConfiguration) RenderCommitMessage(branchName string, viewModel ViewModel) (string, error) {
 	branchType := projConf.GetBranchType(branchName)
 	commitMessageTemplate := projConf.getTemplate(branchType)
+	if commitMessageTemplate == "" {
+		commitMessageTemplate = getFallbackCommitMessageTemplate()
+	}
 	tmpl, err := template.New("commitMessageTemplate").Parse(commitMessageTemplate)
 	if err != nil {
 		return "", err
@@ -82,6 +96,10 @@ func (projConf *ProjectConfiguration) RenderCommitMessage(branchName string, vie
 	err = tmpl.Execute(buffer, viewModel)
 
 	return buffer.String(), err
+}
+
+func getFallbackCommitMessageTemplate() string {
+	return "{{.CommitMessage}}"
 }
 
 func (projConf *ProjectConfiguration) getTemplate(branchType string) string {

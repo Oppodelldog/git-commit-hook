@@ -12,6 +12,7 @@ import (
 
 	"path"
 
+	"github.com/Oppodelldog/git-commit-hook/cmd/diag"
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -26,13 +27,19 @@ const commitMessageFile = ".git/COMMIT_EDITMSG"
 var originals = struct {
 	osArgs                   []string
 	rewriteCommitMessageFunc rewriteCommitMessageFuncDef
-	diagnosticsFunc          diagnosticsFuncDef
+	diagnosticsFunc          callWithIntResult
+	testFunc                 callWithIntResult
+	installFunc              callWithIntResult
+	uninstallFunc            callWithIntResult
 	exitFunc                 exitFuncDef
 	osStdout                 *os.File
 }{
-	osArgs:                   os.Args,
+	osArgs: os.Args,
 	rewriteCommitMessageFunc: rewriteCommitMessageFunc,
 	diagnosticsFunc:          diagnosticsFunc,
+	testFunc:                 testFunc,
+	installFunc:              installFunc,
+	uninstallFunc:            uninstallFunc,
 	exitFunc:                 exitFunc,
 	osStdout:                 os.Stdout,
 }
@@ -40,6 +47,9 @@ var originals = struct {
 //restoreOriginals restores original values
 func restoreOriginals() {
 	diagnosticsFunc = originals.diagnosticsFunc
+	testFunc = originals.testFunc
+	installFunc = originals.installFunc
+	uninstallFunc = originals.uninstallFunc
 	os.Args = originals.osArgs
 	rewriteCommitMessageFunc = originals.rewriteCommitMessageFunc
 	exitFunc = originals.exitFunc
@@ -130,6 +140,41 @@ func TestMain_ErrorCase_TooFewArguments(t *testing.T) {
 	}
 }
 
+func TestMain_FirstArgIsTest_TestFuncCalled(t *testing.T) {
+	defer restoreOriginals()
+
+	testDataSet := map[string]struct {
+		OsArgs                 []string
+		expectTestFuncIsCalled bool
+	}{
+		"no cli argument":                  {[]string{}, false},
+		"one cli argument":                 {[]string{"progname"}, false},
+		"two cli arguments commit-message": {[]string{"progname", "commitMessageFile.txt"}, false},
+		"two cli arguments test-mode":      {[]string{"progname", "test"}, true},
+	}
+
+	for testCaseName, testData := range testDataSet {
+		t.Run(testCaseName, func(t *testing.T) {
+			os.Args = testData.OsArgs
+
+			testFuncCalled := false
+			testFunc = func() int {
+				testFuncCalled = true
+				return 1
+			}
+			assertProgramExistsWith(t, 1)
+			main()
+
+			if testData.expectTestFuncIsCalled {
+				assert.True(t, testFuncCalled)
+			} else {
+				assert.False(t, testFuncCalled)
+			}
+
+		})
+	}
+}
+
 func TestMain_ErrorCase_EmptyCommitMessageFileName(t *testing.T) {
 	defer restoreOriginals()
 
@@ -186,6 +231,21 @@ func TestMain_ExitFuncUsesAppropriateOsFunc(t *testing.T) {
 	assert.Exactly(t, reflect.ValueOf(os.Exit).Pointer(), reflect.ValueOf(exitFunc).Pointer())
 }
 
+func TestMain_DiagnoseFuncMappedCorrectly(t *testing.T) {
+	assert.Exactly(t, reflect.ValueOf(diag.SubCommandDiagnostics).Pointer(), reflect.ValueOf(diagnosticsFunc).Pointer())
+}
+
+func TestMain_TestFuncMappedCorrectly(t *testing.T) {
+	assert.Exactly(t, reflect.ValueOf(diag.Test).Pointer(), reflect.ValueOf(testFunc).Pointer())
+}
+
+func TestMain_InstallFuncMappedCorrectly(t *testing.T) {
+	assert.Exactly(t, reflect.ValueOf(diag.Install).Pointer(), reflect.ValueOf(installFunc).Pointer())
+}
+
+func TestMain_UnnstallFuncMappedCorrectly(t *testing.T) {
+	assert.Exactly(t, reflect.ValueOf(diag.Uninstall).Pointer(), reflect.ValueOf(uninstallFunc).Pointer())
+}
 func assertProgramExistsWith(t *testing.T, expectedExitCode int) {
 	exitFunc = func(exitCode int) {
 		assert.Exactly(t, expectedExitCode, exitCode)
