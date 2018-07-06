@@ -4,7 +4,7 @@
 [[projects]]
   name = "github.com/Oppodelldog/filediscovery"
   packages = ["."]
-  revision = "75cb86ab87f615aa3edd8bef4a25a440d3043c32"
+  revision = "4da0ea434b80a588ce75c905121d3c9e21ac21c0"
   version = "0.1.0"
 
 [[projects]]
