@@ -21,9 +21,21 @@
 
 
 [[constraint]]
+  name = "github.com/Oppodelldog/filediscovery"
+  version = "0.1.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/glenn-brown/golang-pkg-pcre"
+
+[[constraint]]
   name = "github.com/pkg/errors"
   version = "0.8.0"
 
 [[constraint]]
   name = "github.com/stretchr/testify"
-  version = "1.2.1"
+  version = "1.2.2"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
