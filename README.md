@@ -8,17 +8,22 @@
 
 **Validate commit message**
 
-### 1. install
-#### Download
-downlod the binary and ensure your user has execution permissions
-#### Install
-Copy or link the binary into your git repositories ```hooks``` folder
-(Project/.git/hooks), rename it to ```commit-msg```
+### 1. Install
+Downlod the binary, put it into a folder of your $PATH (for example. /usr/local/bin)*[]:
 
-Or create a symlink:
-```ln -sf ~/Downloads/git-commit-hook ~/MyProject/.git/hooks/commit-msg```
+Ensure your user has execution permissions on that file.
 
 ### 2. Configure
+There are several places you can put the configuration.
+
+Create a config file named ```git-commit-hook.yaml```.
+
+#### central configuration
+Create the configuration below your user folder:
+
+**/home/*user*/.config/git-commit-hook**
+
+
 ```yaml
  "project xyz":
    # path to the git repository
@@ -35,38 +40,80 @@ Or create a symlink:
    # define validation rules per branch type
    validation:
       master:
-        "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+        "^.*(#\d*)+.*$" : must have a ticket reference (eg. #267)
  ```
- There are several places the configuration will be searched at, but one thing is for sure, the config file
- must be named ```git-commit-hook.yaml```.
-
- Here are some places the configuration will be searched at:
- * **~/.config/git-commit-hook**
- * inside the **git repository** you commit in (also in subfolders **.git**, **.git/hooks**)
 
 Watch out the test [fixture](config/test-data.yaml) for full feature sample
 
-### 3. Commit
-You can do it on your own, I know that!!
+### 3. Activate
+Use the subcommand ```install``` to activate the commit-message-hook in your repository.
 
 ---
 
-### Configuration check
-to check if the git hook is installed and configured correctly, just call the command from
-your repository like this:
-```.git/hooks/commit-msg```
+### Sub-Commands
+There are some useful subcommands which ease the use of the commit-message hook.
 
-The output will be something like this:
+#### git-commit-hook install
+Installs the commit-hook in the configured repositories.
 
-    git-commit-hook - parsed configuration
+You need to specify either **-p** or **-a**.
 
+* **-p** to install in the given repository (eg. **-p "project xyz"**)
+* **-a** to install in all configured repositories
 
-    branch types:
-         master : ^(origin\/)*master
+If there's already a commit-message-hook installed, you can overwrite by adding ```-f```.
 
-    branch type templates:
-         master : {{.CommitMessage}} - whatever !!! {{.BranchName}}
+#### git-commit-hook uninstall
+Uninstalls the commit-hook from the configured repositories.
 
-    branch type validation:
-         master :
-             (?m)^.*(#\d*)+.*$ : must have a ticket reference (eg. #267)
+You need to specify either **-p** or **-a**.
+
+* **-p** to uninstall from the given repository (eg. **-p "project xyz"**)
+* **-a** to uninstall from all configured repositories
+
+#### git-commit-hook diag
+Gives an overview of the configuration and the installed commit hooks
+
+#### git-commit-hook test
+
+The test command is useful to test configuration and simulate a commit-situation.
+
+You may input the following parameters:
+* **-p** project name
+* **-b** branch name
+* **m** commit message
+
+**Sample:**
+
+```shell
+git-commit-hook test -m "short commit message" -b master -p testrepo
+```
+
+in this case, validation will fail, since it's required to give a ticket/issue reference in the commit message.
+
+```shell
+testing configuration '/home/nils/.config/git-commit-hook/git-commit-hook.yaml':
+project        : testrepo
+branch         : master
+commit message : short commit message
+
+validation error for branch 'master'
+at least expected one of the following to match
+ - must have a ticket reference (eg. #267)
+```
+
+If you pass a valid commit message
+```shell
+git-commit-hook test -m "fix #121" -b master -p testrepo
+```
+
+shows not validation errors, but shows the finally rendered message.
+```shell
+testing configuration '/home/nils/.config/git-commit-hook/git-commit-hook.yaml':
+project        : testrepo
+branch         : master
+commit message : fix #121
+
+would generate the following commit message:
+fix #121
+```
