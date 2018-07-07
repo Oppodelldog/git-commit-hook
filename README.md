@@ -3,13 +3,9 @@
 # git-commit-hook
 > configureable git commit hook
 
-
-**Customize commit messages dynamically with templating**
-
-**Validate commit message**
-
 ### 1. Install
-Downlod the binary, put it into a folder of your $PATH (for example. /usr/local/bin)*[]:
+
+Downlod the binary, put it into a folder of your $PATH (for example. /usr/local/bin).
 
 Ensure your user has execution permissions on that file.
 
@@ -40,7 +36,7 @@ Create the configuration below your user folder:
    # define validation rules per branch type
    validation:
       master:
-        "^.*(#\d*)+.*$" : must have a ticket reference (eg. #267)
+        "^.*(#\\d*)+.*$" : must have a ticket reference (eg. #267)
  ```
 
 Watch out the test [fixture](config/test-data.yaml) for full feature sample
