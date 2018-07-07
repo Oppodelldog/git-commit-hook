@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/Oppodelldog/git-commit-hook)](https://goreportcard.com/report/github.com/Oppodelldog/git-commit-hook) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/Oppodelldog/git-commit-hook/master/LICENSE) [![Linux build](http://nulldog.de:12080/api/badges/Oppodelldog/git-commit-hook/status.svg)](http://nulldog.de:12080/Oppodelldog/git-commit-hook) [![Coverage Status](https://coveralls.io/repos/github/Oppodelldog/git-commit-hook/badge.svg?branch=master)](https://coveralls.io/github/Oppodelldog/git-commit-hook?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Oppodelldog/git-commit-hook)](https://goreportcard.com/report/github.com/Oppodelldog/git-commit-hook) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/Oppodelldog/git-commit-hook/master/LICENSE) [![Linux build](http://nulldog.de:12080/api/badges/Oppodelldog/git-commit-hook/status.svg)](http://nulldog.de:12080/Oppodelldog/git-commit-hook)
 
 # git-commit-hook
 > configureable git commit hook
