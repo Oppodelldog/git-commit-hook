@@ -14,7 +14,6 @@ There are several places you can put the configuration.
 
 Create a config file named ```git-commit-hook.yaml```.
 
-#### central configuration
 Create the configuration below your user folder:
 
 **/home/*user*/.config/git-commit-hook**
@@ -44,12 +43,11 @@ Watch out the test [fixture](config/test-data.yaml) for full feature sample
 ### 3. Activate
 Use the subcommand ```install``` to activate the commit-message-hook in your repository.
 
----
 
-### Sub-Commands
+## Sub-Commands
 There are some useful subcommands which ease the use of the commit-message hook.
 
-#### git-commit-hook install
+### git-commit-hook install
 Installs the commit-hook in the configured repositories.
 
 You need to specify either **-p** or **-a**.
@@ -59,7 +57,7 @@ You need to specify either **-p** or **-a**.
 
 If there's already a commit-message-hook installed, you can overwrite by adding ```-f```.
 
-#### git-commit-hook uninstall
+### git-commit-hook uninstall
 Uninstalls the commit-hook from the configured repositories.
 
 You need to specify either **-p** or **-a**.
@@ -67,10 +65,10 @@ You need to specify either **-p** or **-a**.
 * **-p** to uninstall from the given repository (eg. **-p "project xyz"**)
 * **-a** to uninstall from all configured repositories
 
-#### git-commit-hook diag
+### git-commit-hook diag
 Gives an overview of the configuration and the installed commit hooks
 
-#### git-commit-hook test
+### git-commit-hook test
 
 The test command is useful to test configuration and simulate a commit-situation.
 
