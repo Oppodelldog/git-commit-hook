@@ -1,16 +1,16 @@
-package gitcommithook
+package hook
 
 import (
 	"os"
 	"testing"
 
+	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 const commitMessageFile = ".git/COMMIT_MSG_EDIT"
 const commitMessage = "commitMessage"
-const modifiedCommitMessage = "modified commitMessage"
 
 var rewriteOriginals = struct {
 	readFileFunc  readFileFuncDef
@@ -18,13 +18,11 @@ var rewriteOriginals = struct {
 	writeFileFunc writeFileFuncDef
 }{
 	readFileFunc:  readFileFunc,
-	modifyFunc:    modifyFunc,
 	writeFileFunc: writeFileFunc,
 }
 
 func restoreRewriteOriginals() {
 	readFileFunc = rewriteOriginals.readFileFunc
-	modifyFunc = rewriteOriginals.modifyFunc
 	writeFileFunc = rewriteOriginals.writeFileFunc
 }
 
@@ -32,8 +30,9 @@ func TestRewriteCommitMessage_ErrorCase_CannotFindCommitMessageFile(t *testing.T
 	defer restoreRewriteOriginals()
 
 	commitMessageFileCannotBeFound(t)
+	modifier := NewCommitMessageModifier(config.Project{})
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, modifier)
 
 	assert.Contains(t, err.Error(), "error reading commit message")
 }
@@ -41,21 +40,30 @@ func TestRewriteCommitMessage_ErrorCase_CannotFindCommitMessageFile(t *testing.T
 func TestRewriteCommitMessage_ErrorCase_ErrorModifyingMessage(t *testing.T) {
 	defer restoreRewriteOriginals()
 	commitMessageFileCanBeRead(t)
-	errorModifyingCommitMessage(t)
+	modifier := &commitMessageModifierStub{"", errors.New("some error")}
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, modifier)
 
-	assert.Contains(t, err.Error(), "error modifying commit message")
+	assert.Contains(t, err.Error(), "some error")
+}
+
+type commitMessageModifierStub struct {
+	gitCommitMessage string
+	err              error
+}
+
+func (m *commitMessageModifierStub) ModifyGitCommitMessage(gitCommitMessage string,branchName string) (modifiedCommitMessage string, err error) {
+	return m.gitCommitMessage, m.err
 }
 
 func TestRewriteCommitMessage_ErrorCase_CannotWriteMessageToFile(t *testing.T) {
 	defer restoreRewriteOriginals()
 
 	commitMessageFileCanBeRead(t)
-	commitMessageIsModified(t)
 	cannotWriteToFile(t)
+	modifier := NewCommitMessageModifier(config.Project{})
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, modifier)
 
 	assert.Contains(t, err.Error(), "error writing commit message to")
 }
@@ -64,10 +72,10 @@ func TestRewriteCommitMessage_HappyPath(t *testing.T) {
 	defer restoreRewriteOriginals()
 
 	commitMessageFileCanBeRead(t)
-	commitMessageIsModified(t)
 	commitMessageIsWrittenToFile(t)
+	modifier := NewCommitMessageModifier(config.Project{})
 
-	err := RewriteCommitMessage(commitMessageFile)
+	err := RewriteCommitMessage(commitMessageFile, modifier)
 
 	assert.NoError(t, err)
 }
@@ -75,7 +83,7 @@ func TestRewriteCommitMessage_HappyPath(t *testing.T) {
 func cannotWriteToFile(t *testing.T) {
 	writeFileFunc = func(fileName string, data []byte, perm os.FileMode) error {
 		assert.Exactly(t, commitMessageFile, fileName)
-		assert.Exactly(t, modifiedCommitMessage, string(data))
+		assert.Exactly(t, commitMessage, string(data))
 		assert.Exactly(t, perm, os.FileMode(0777))
 
 		return errors.New("cannot write to file")
@@ -85,7 +93,7 @@ func cannotWriteToFile(t *testing.T) {
 func commitMessageIsWrittenToFile(t *testing.T) {
 	writeFileFunc = func(fileName string, data []byte, perm os.FileMode) error {
 		assert.Exactly(t, commitMessageFile, fileName)
-		assert.Exactly(t, modifiedCommitMessage, string(data))
+		assert.Exactly(t, commitMessage, string(data))
 		assert.Exactly(t, perm, os.FileMode(0777))
 
 		return nil
@@ -103,19 +111,5 @@ func commitMessageFileCannotBeFound(t *testing.T) {
 	readFileFunc = func(fileName string) ([]byte, error) {
 		assert.Exactly(t, commitMessageFile, fileName)
 		return []byte{}, errors.New("Could not find file")
-	}
-}
-
-func errorModifyingCommitMessage(t *testing.T) {
-	modifyFunc = func(message string) (string, error) {
-		assert.Exactly(t, commitMessage, message)
-		return "", errors.New("error modifying")
-	}
-}
-
-func commitMessageIsModified(t *testing.T) {
-	modifyFunc = func(message string) (string, error) {
-		assert.Exactly(t, commitMessage, message)
-		return modifiedCommitMessage, nil
 	}
 }

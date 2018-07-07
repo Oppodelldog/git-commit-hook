@@ -1,17 +1,12 @@
-SOURCE_FILES?=$$(go list ./... | grep -v /vendor/)
-TEST_PATTERN?=.
-TEST_OPTIONS?=-race -covermode=atomic -coverprofile=coverage.txt
-
 setup: ## Install all the build and lint dependencies
 	go get -u gopkg.in/alecthomas/gometalinter.v2
 	go get -u github.com/golang/dep/cmd/dep
-	go get -u golang.org/x/tools/cmd/cover
 	go get -u golang.org/x/tools/cmd/goimports
 	dep ensure
 	gometalinter --install --update
 
 test: ## Run all the tests
-	gotestcover $(TEST_OPTIONS)  $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=1m
+	echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -race -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
 
 cover: test ## Run all the tests and opens the coverage report
 	go tool cover -html=coverage.txt
@@ -41,9 +36,15 @@ lint: ## Run all the linters
 		--deadline=10m \
 		./...
 
-ci: lint test ## Run all the tests and code checks
+ci: ## Run all the tests and code checks
+	dep ensure
+	go get ./...
+	go get github.com/mattn/goveralls
+	goveralls -service drone.io -repotoken BddPGJN9lAFBYHLGI5mIHLjZVJlD74n3X
+	go build cmd/main.go
 
 build: ## build binary to .build folder
+	rm -f .build/git-commit-hook
 	go build -o ".build/git-commit-hook" cmd/main.go
 
 install: ## Install to <gopath>/src
@@ -51,7 +52,6 @@ install: ## Install to <gopath>/src
 
 build-release: ## builds the checked out version into the .release/${tag} folder
 	.release/build.sh
-
 
 # Self-Documented Makefile see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:

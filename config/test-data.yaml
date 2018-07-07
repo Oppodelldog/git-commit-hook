@@ -1,0 +1,33 @@
+# at first specify some project name
+"project xyz":
+  # path to the git repository this project configuration should be used for
+  path: "/home/nils/projects/xyz/.git"
+
+  # define types of branch and a pattern to identify the type for the current branch you are working on
+  branch:
+     master: "^(origin\\/)*master"
+     feature: "^((?!master|release|develop).)*$"
+     develop: "^(origin\\/)*develop$"
+     release: "^(origin\\/)*release\\/v([0-9]*\\.*)*$"
+     hotfix: "^(origin\\/)*hotfix\\/v([0-9]*\\.*)*$"
+
+  # define a commit message template per branch type, or as here for all (*) branch types
+  # templates for defined branch types are taken in advance of * template
+  template:
+    "*": "{.BranchName}: {.CommitMessage}"
+
+  # define validation rules per branch type
+  # for example "commit messages in feature branches should always contain a ticket reference"
+  validation:
+     feature:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+     develop:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+       "(?m)@noissue" : "@noissue"
+     release:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+       "(?m)@rc-fix" : "an @rc-fix indicator"
+       "(?m)@noissue" : "@noissue"
+     master:
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
+       "(?m)@noissue" : "@noissue"
