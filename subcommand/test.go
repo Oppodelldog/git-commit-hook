@@ -51,7 +51,7 @@ func Test() int {
 		if branchName != "" {
 			fmt.Printf("branch         : %s\n", branchName)
 		}
-		fmt.Printf("commit message : %s\n", branchName)
+		fmt.Printf("commit message : %s\n", commitMessage)
 		fmt.Println()
 
 		var modifiedCommitMessage string
