@@ -1,6 +1,6 @@
 workspace:
-  base: /go
-  path: src/github.com/Oppodelldog/git-commit-hook
+  base: /go/src/github.com/Oppodelldog/git-commit-hook
+  path: /
 
 pipeline:
   build:
