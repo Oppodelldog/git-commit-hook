@@ -4,6 +4,6 @@ workspace:
 
 pipeline:
   build:
-    image: docker.io/oppodelldog/git-commit-hook:1
+    image: oppodelldog/git-commit-hook:latest
     commands:
       - make ci
