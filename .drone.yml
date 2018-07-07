@@ -7,6 +7,7 @@ pipeline:
     image: oppodelldog/git-commit-hook:latest
     pull: true
     commands:
+      - ls -al /go/bin
       - pwd
       - ls -al
       - make ci
