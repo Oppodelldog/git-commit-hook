@@ -15,8 +15,8 @@ type callWithIntResult func() int
 type rewriteCommitMessageFuncDef func(string, hook.CommitMessageModifier) error
 type exitFuncDef func(code int)
 
-var diagnosticsFunc = callWithIntResult(subcommand.Diagnostics)
-var testFunc = callWithIntResult(subcommand.Test)
+var diagnosticsFunc = callWithIntResult(subcommand.NewDiagCommand().Diagnostics)
+var testFunc = callWithIntResult(subcommand.NewTestCommand().Test)
 var installFunc = callWithIntResult(subcommand.Install)
 var uninstallFunc = callWithIntResult(subcommand.Uninstall)
 var rewriteCommitMessageFunc = rewriteCommitMessageFuncDef(hook.RewriteCommitMessage)

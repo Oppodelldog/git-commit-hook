@@ -15,9 +15,9 @@ type (
 		validateCommitmessageFunc ValidateCommitMessageFuncDef
 	}
 
-	CreateViewModelFuncDef func(gitCommitMessage string, branchName string) ViewModel
+	CreateViewModelFuncDef       func(gitCommitMessage string, branchName string) ViewModel
 	ValidateCommitMessageFuncDef func(branchName, modifiedCommitMessage string) error
-	RenderCommitMessageFuncDef func(branchName string, viewModel ViewModel) (string, error)
+	RenderCommitMessageFuncDef   func(branchName string, viewModel ViewModel) (string, error)
 )
 
 func NewCommitMessageModifier(projectConfiguration config.Project) CommitMessageModifier {

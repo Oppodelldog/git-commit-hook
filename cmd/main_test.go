@@ -230,11 +230,11 @@ func TestMain_ExitFuncUsesAppropriateOsFunc(t *testing.T) {
 }
 
 func TestMain_DiagnoseFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(subcommand.Diagnostics).Pointer(), reflect.ValueOf(diagnosticsFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.NewDiagCommand().Diagnostics).Pointer(), reflect.ValueOf(diagnosticsFunc).Pointer())
 }
 
 func TestMain_TestFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(subcommand.Test).Pointer(), reflect.ValueOf(testFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.NewTestCommand().Test).Pointer(), reflect.ValueOf(testFunc).Pointer())
 }
 
 func TestMain_InstallFuncMappedCorrectly(t *testing.T) {

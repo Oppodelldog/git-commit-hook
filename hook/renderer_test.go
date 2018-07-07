@@ -1,9 +1,10 @@
 package hook
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
 	"github.com/Oppodelldog/git-commit-hook/config"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRenderCommitMessage(t *testing.T) {

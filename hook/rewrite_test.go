@@ -14,7 +14,6 @@ const commitMessage = "commitMessage"
 
 var rewriteOriginals = struct {
 	readFileFunc  readFileFuncDef
-	modifyFunc    modifyFuncDef
 	writeFileFunc writeFileFuncDef
 }{
 	readFileFunc:  readFileFunc,
@@ -52,7 +51,7 @@ type commitMessageModifierStub struct {
 	err              error
 }
 
-func (m *commitMessageModifierStub) ModifyGitCommitMessage(gitCommitMessage string,branchName string) (modifiedCommitMessage string, err error) {
+func (m *commitMessageModifierStub) ModifyGitCommitMessage(gitCommitMessage string, branchName string) (modifiedCommitMessage string, err error) {
 	return m.gitCommitMessage, m.err
 }
 

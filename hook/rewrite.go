@@ -5,14 +5,12 @@ import (
 
 	"os"
 
-	"github.com/Oppodelldog/git-commit-hook/config"
-	"github.com/pkg/errors"
 	"github.com/Oppodelldog/git-commit-hook/git"
+	"github.com/pkg/errors"
 )
 
 type (
-	readFileFuncDef func(filename string) ([]byte, error)
-	modifyFuncDef func(string, config.Project) (string, error)
+	readFileFuncDef  func(filename string) ([]byte, error)
 	writeFileFuncDef func(string, []byte, os.FileMode) error
 )
 

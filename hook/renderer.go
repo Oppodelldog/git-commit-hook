@@ -2,8 +2,9 @@ package hook
 
 import (
 	"bytes"
-	"github.com/Oppodelldog/git-commit-hook/config"
 	"text/template"
+
+	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
 type CommitMessageRenderer struct {

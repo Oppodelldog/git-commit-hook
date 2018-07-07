@@ -3,9 +3,10 @@ package hook
 import (
 	"testing"
 
+	"errors"
+
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/stretchr/testify/assert"
-	"errors"
 )
 
 func TestModifyGitCommitMessage(t *testing.T) {

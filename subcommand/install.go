@@ -14,7 +14,7 @@ func Install() int {
 	var projectName string
 	var allFlag bool
 	var forceOverwrite bool
-	flagSet := flag.NewFlagSet("install-flagset", flag.ContinueOnError)
+	flagSet := flag.NewFlagSet("git-commit-hook install", flag.ContinueOnError)
 	flagSet.StringVar(&projectName, "p", "", `project name`)
 	flagSet.BoolVar(&allFlag, "a", false, `all`)
 	flagSet.BoolVar(&forceOverwrite, "f", false, `force file creation by overwriting`)
@@ -36,13 +36,13 @@ func Install() int {
 			fmt.Println(err)
 			return 1
 		}
-		err = installProject(projectConfiguraiton.Path, forceOverwrite)
+		err = installForProject(projectConfiguraiton.Path, forceOverwrite)
 		if err != nil {
 			fmt.Println(err)
 			return 1
 		}
 	} else if allFlag {
-		err := installAllProjects(configuration, forceOverwrite)
+		err := installForAllProjects(configuration, forceOverwrite)
 		if err != nil {
 			fmt.Println(err)
 			return 1
@@ -54,10 +54,10 @@ func Install() int {
 	return 0
 }
 
-func installAllProjects(configuration *config.Configuration, forceOverwrite bool) error {
+func installForAllProjects(configuration *config.Configuration, forceOverwrite bool) error {
 	var hasErrors bool
 	for _, projectConfiguration := range *configuration {
-		err := installProject(projectConfiguration.Path, forceOverwrite)
+		err := installForProject(projectConfiguration.Path, forceOverwrite)
 		if err != nil {
 			hasErrors = true
 		}
@@ -68,7 +68,7 @@ func installAllProjects(configuration *config.Configuration, forceOverwrite bool
 	return nil
 }
 
-func installProject(gitFolderPath string, forceOverwrite bool) error {
+func installForProject(gitFolderPath string, forceOverwrite bool) error {
 
 	exeFile, err := os.Executable()
 	if err != nil {

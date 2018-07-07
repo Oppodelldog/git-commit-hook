@@ -6,6 +6,7 @@ setup: ## Install all the build and lint dependencies
 	gometalinter --install --update
 
 test: ## Run all the tests
+	rm -f coverage.tmp && rm -f coverage.txt
 	echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -race -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
 
 cover: test ## Run all the tests and opens the coverage report
@@ -14,7 +15,8 @@ cover: test ## Run all the tests and opens the coverage report
 fmt: ## gofmt and goimports all go files
 	find . -name '*.go' -not -wholename './vendor/*' | while read -r file; do gofmt -w -s "$$file"; goimports -w "$$file"; done
 
-lint: ## Run all the linters
+lint:  fmt ## Run all the linters
+lint:  fmt ## Run all the linters
 	gometalinter --vendor --disable-all \
 		--enable=deadcode \
 		--enable=gocyclo \

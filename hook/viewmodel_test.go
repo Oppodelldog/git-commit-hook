@@ -2,6 +2,7 @@ package hook
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 

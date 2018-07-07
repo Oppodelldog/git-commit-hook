@@ -13,7 +13,7 @@ import (
 func Uninstall() int {
 	var projectName string
 	var allFlag bool
-	flagSet := flag.NewFlagSet("uninstall-flagset", flag.ContinueOnError)
+	flagSet := flag.NewFlagSet("git-commit-hook uninstall", flag.ContinueOnError)
 	flagSet.StringVar(&projectName, "p", "", `project name`)
 	flagSet.BoolVar(&allFlag, "a", false, `all`)
 	err := flagSet.Parse(os.Args[2:])
@@ -34,13 +34,13 @@ func Uninstall() int {
 			fmt.Println(err)
 			return 1
 		}
-		err = uninstallProject(projectConfiguraiton.Path)
+		err = uninstallForProject(projectConfiguraiton.Path)
 		if err != nil {
 			fmt.Println(err)
 			return 1
 		}
 	} else if allFlag {
-		err := uninstallAllProject(configuration)
+		err := uninstallForAllProject(configuration)
 		if err != nil {
 			fmt.Println(err)
 			return 1
@@ -52,10 +52,10 @@ func Uninstall() int {
 	return 0
 }
 
-func uninstallAllProject(configuration *config.Configuration) error {
+func uninstallForAllProject(configuration *config.Configuration) error {
 	var hasErrors bool
 	for _, projectConfiguration := range *configuration {
-		err := uninstallProject(projectConfiguration.Path)
+		err := uninstallForProject(projectConfiguration.Path)
 		if err != nil {
 			hasErrors = true
 		}
@@ -66,7 +66,7 @@ func uninstallAllProject(configuration *config.Configuration) error {
 	return nil
 }
 
-func uninstallProject(gitFolderPath string) error {
+func uninstallForProject(gitFolderPath string) error {
 
 	commitHookFilePath := createCommitHookFilePath(gitFolderPath)
 
