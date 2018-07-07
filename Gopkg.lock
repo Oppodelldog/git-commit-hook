@@ -8,17 +8,6 @@
   version = "0.1.0"
 
 [[projects]]
-  branch = "add_configuration"
-  name = "github.com/Oppodelldog/git-commit-hook"
-  packages = [
-    "config",
-    "git",
-    "hook",
-    "subcommand"
-  ]
-  revision = "c4577ea493e7fb62b7308202a0201285648d6e85"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -57,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f0394e96d6769e4c98b030ca8a18c02594b81abc58e04f70d8d51f21ad0c043e"
+  inputs-digest = "1656019a652d1f88615d43721c834eff3b0d90513d0e52cc7a8581d6b7c6417e"
   solver-name = "gps-cdcl"
   solver-version = 1
