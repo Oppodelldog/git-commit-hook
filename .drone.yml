@@ -7,5 +7,4 @@ pipeline:
     image: oppodelldog/git-commit-hook:latest
     pull: true
     commands:
-      - cd /go/src/github.com/Oppodelldog/git-commit-hook
       - make ci

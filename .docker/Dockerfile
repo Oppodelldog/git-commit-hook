@@ -1,5 +1,7 @@
 FROM golang:1.10
 
+WORKDIR /go/src/github.com/Oppodelldog/git-commit-hook
+
 RUN go get -u gopkg.in/alecthomas/gometalinter.v2 && \
 	go get -u github.com/golang/dep/cmd/dep && \
 	go get -u golang.org/x/tools/cmd/goimports && \
