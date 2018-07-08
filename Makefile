@@ -42,7 +42,7 @@ ci: ## Run all the tests and code checks
 	dep ensure
 	go get ./...
 	go get github.com/mattn/goveralls
-	goveralls -service drone.io -repotoken BddPGJN9lAFBYHLGI5mIHLjZVJlD74n3X
+	goveralls -service drone.io -repotoken RntNpBhYdQfIbW9L6utYe6Rukg19peiln
 	go build cmd/main.go
 
 build: ## build binary to .build folder
