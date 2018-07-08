@@ -26,7 +26,7 @@ func TestParse(t *testing.T) {
 				"*": `{.BranchName}: {.CommitMessage}`,
 			},
 			Validation: map[string]BranchValidationConfiguration{
-				"feature": {
+				"*": {
 					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID",
 				},
 				"develop": {

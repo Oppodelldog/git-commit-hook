@@ -11,9 +11,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//TestPath holds the absolute path to the test folder
+// TestPath holds the absolute path to the test folder
 const TestPath = "/tmp/git-commit-hook"
+
+// TestPathGitFolder holds the .git folder for the test
 const TestPathGitFolder = "/tmp/git-commit-hook/.git"
+
+// TestPathHooksFolder holds the hooks folder inside the .git folder for the test
 const TestPathHooksFolder = "/tmp/git-commit-hook/.git/hooks"
 
 //InitGitRepository initializes a test git repository with the given branch name in the current directory

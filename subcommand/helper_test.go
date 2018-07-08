@@ -5,10 +5,11 @@ import (
 	"path"
 	"testing"
 
+	"os"
+
+	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/testhelper"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
 func TestIsAnotherGitHookInstalled(t *testing.T) {
@@ -105,7 +106,7 @@ func TestLoadProjectConfiguration(t *testing.T) {
 		},
 		"config not found": {
 			expectedErrorMessage: "could not find config file at",
-			prepare:              func() {
+			prepare: func() {
 				testhelper.InitTestFolder(t)
 			},
 		},
@@ -125,7 +126,7 @@ func TestLoadProjectConfiguration(t *testing.T) {
 			assert.IsType(t, config.Project{}, configuration)
 			if testData.expectedErrorMessage != "" {
 				assert.Contains(t, err.Error(), testData.expectedErrorMessage)
-			}else{
+			} else {
 				assert.NoError(t, err)
 			}
 

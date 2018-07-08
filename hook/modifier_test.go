@@ -96,7 +96,7 @@ func TestModifyGitCommitMessage_commitMessageRendererReturnsError_ExpectError(t 
 	branchName := "feature123"
 	errStub := errors.New("stubbed renderer error")
 	modifier := NewCommitMessageModifier(config.Project{})
-	modifier.(*commitMessageModifier).renderCommitMessageFunc = func(branchName string, viewModel ViewModel) (string, error) {
+	modifier.(*commitMessageModifier).renderCommitMessageFunc = func(viewModel ViewModel) (string, error) {
 		return "", errStub
 	}
 	_, err := modifier.ModifyGitCommitMessage(commitMessage, branchName)

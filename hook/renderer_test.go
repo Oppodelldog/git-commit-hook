@@ -8,7 +8,6 @@ import (
 )
 
 func TestRenderCommitMessage(t *testing.T) {
-	configBranchName := "feature"
 	viewModel := ViewModel{
 		BranchName:    "feature/PRJ_TEST-1242",
 		CommitMessage: "initial commit",
@@ -20,10 +19,10 @@ func TestRenderCommitMessage(t *testing.T) {
 		Templates: map[string]config.BranchTypeTemplate{
 			"feature": "{{.BranchName}}: {{.CommitMessage}}",
 		}}
-	renderer := CommitMessageRenderer{*cfg}
-	modifiedCommitMessage, err := renderer.RenderCommitMessage(configBranchName, viewModel)
+	renderer := commitMessageRenderer{*cfg}
+	modifiedCommitMessage, err := renderer.Render(viewModel)
 	if err != nil {
-		t.Fatalf("Did not expect RenderCommitMessage to return an error, but got: %v ", err)
+		t.Fatalf("Did not expect Render to return an error, but got: %v ", err)
 	}
 
 	expectedCommitMessage := "feature/PRJ_TEST-1242: initial commit"
@@ -31,7 +30,6 @@ func TestRenderCommitMessage(t *testing.T) {
 }
 
 func TestRenderCommitMessage_InvalidTemplate_ReturnsError(t *testing.T) {
-	configBranchName := "feature"
 	invalidTemplate := "{{{{{ HELLO"
 	viewModel := ViewModel{}
 	cfg := &config.Project{
@@ -42,15 +40,14 @@ func TestRenderCommitMessage_InvalidTemplate_ReturnsError(t *testing.T) {
 			"feature": config.BranchTypeTemplate(invalidTemplate),
 		}}
 
-	renderer := CommitMessageRenderer{*cfg}
-	_, err := renderer.RenderCommitMessage(configBranchName, viewModel)
+	renderer := commitMessageRenderer{*cfg}
+	_, err := renderer.Render(viewModel)
 
 	assert.Contains(t, err.Error(), "template:")
 }
 
 func TestRenderCommitMessage_NoTemplateFound_PassesBackTheGivenCommitMessage(t *testing.T) {
 	givenCommitMessage := "some commit message"
-	configBranchName := "feature"
 	viewModel := ViewModel{
 		CommitMessage: givenCommitMessage,
 	}
@@ -60,10 +57,10 @@ func TestRenderCommitMessage_NoTemplateFound_PassesBackTheGivenCommitMessage(t *
 		},
 		Templates: map[string]config.BranchTypeTemplate{}}
 
-	renderer := CommitMessageRenderer{*cfg}
-	modifiedCommitMessage, err := renderer.RenderCommitMessage(configBranchName, viewModel)
+	renderer := commitMessageRenderer{*cfg}
+	modifiedCommitMessage, err := renderer.Render(viewModel)
 	if err != nil {
-		t.Fatalf("Did not expect RenderCommitMessage to return an error, but got: %v ", err)
+		t.Fatalf("Did not expect Render to return an error, but got: %v ", err)
 	}
 
 	assert.Exactly(t, givenCommitMessage, modifiedCommitMessage)
@@ -78,7 +75,7 @@ func TestGetTemplate(t *testing.T) {
 			"branch4": "templ4",
 		},
 	}
-	renderer := CommitMessageRenderer{*cfg}
+	renderer := commitMessageRenderer{*cfg}
 	template := renderer.getTemplate("branch2")
 	assert.Exactly(t, "templ2", template)
 
@@ -91,7 +88,6 @@ func TestGetTemplate(t *testing.T) {
 
 func TestRenderCommitMessage_NoBranchConfiguration_PassesBackTheGivenCommitMessage(t *testing.T) {
 	givenCommitMessage := "some commit message"
-	configBranchName := "feature"
 	viewModel := ViewModel{
 		CommitMessage: givenCommitMessage,
 	}
@@ -99,10 +95,10 @@ func TestRenderCommitMessage_NoBranchConfiguration_PassesBackTheGivenCommitMessa
 		BranchTypes: map[string]config.BranchTypePattern{},
 		Templates:   map[string]config.BranchTypeTemplate{}}
 
-	renderer := CommitMessageRenderer{*cfg}
-	modifiedCommitMessage, err := renderer.RenderCommitMessage(configBranchName, viewModel)
+	renderer := commitMessageRenderer{*cfg}
+	modifiedCommitMessage, err := renderer.Render(viewModel)
 	if err != nil {
-		t.Fatalf("Did not expect RenderCommitMessage to return an error, but got: %v ", err)
+		t.Fatalf("Did not expect Render to return an error, but got: %v ", err)
 	}
 
 	assert.Exactly(t, givenCommitMessage, modifiedCommitMessage)

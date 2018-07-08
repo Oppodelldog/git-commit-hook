@@ -19,8 +19,6 @@
   # define validation rules per branch type
   # for example "commit messages in feature branches should always contain a ticket reference"
   validation:
-     feature:
-       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
      develop:
        "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
        "(?m)@noissue" : "@noissue"
@@ -31,3 +29,5 @@
      master:
        "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID"
        "(?m)@noissue" : "@noissue"
+     "*":
+       "(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)" : "valid ticket ID (fallback validator)"

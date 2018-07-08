@@ -14,7 +14,10 @@ type (
 
 func createViewModel(commitMessage string, branchName string) ViewModel {
 	trimmedCommitMessage := strings.Trim(commitMessage, " \t\r\n")
-	viewModel := ViewModel{CommitMessage: trimmedCommitMessage, BranchName: branchName}
+	viewModel := ViewModel{
+		CommitMessage: trimmedCommitMessage,
+		BranchName:    branchName,
+	}
 
 	return viewModel
 }

@@ -13,6 +13,7 @@ import (
 
 func TestDiagCommand_Diagnostics(t *testing.T) {
 	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
 	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()

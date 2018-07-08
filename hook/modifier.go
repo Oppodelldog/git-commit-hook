@@ -18,16 +18,15 @@ type (
 
 	createViewModelFuncDef       func(gitCommitMessage string, branchName string) ViewModel
 	validateCommitMessageFuncDef func(branchName, modifiedCommitMessage string) error
-	renderCommitMessageFuncDef   func(branchName string, viewModel ViewModel) (string, error)
+	renderCommitMessageFuncDef   func(viewModel ViewModel) (string, error)
 )
 
 // NewCommitMessageModifier create a CommitMessageModifier
 func NewCommitMessageModifier(projectConfiguration config.Project) CommitMessageModifier {
-	commitMessageRenderer := &CommitMessageRenderer{projectConfiguration}
 	return &commitMessageModifier{
 		createViewModelFunc:       createViewModel,
-		renderCommitMessageFunc:   commitMessageRenderer.RenderCommitMessage,
-		validateCommitmessageFunc: projectConfiguration.Validate,
+		renderCommitMessageFunc:   NewCommitMessageRenderer(projectConfiguration).Render,
+		validateCommitmessageFunc: NewCommitMessageValidator(projectConfiguration).Validate,
 	}
 }
 
@@ -49,7 +48,7 @@ func (m *commitMessageModifier) ModifyGitCommitMessage(gitCommitMessage string, 
 
 	viewModel := createViewModel(gitCommitMessage, branchName)
 
-	modifiedCommitMessage, err = m.renderCommitMessageFunc(branchName, viewModel)
+	modifiedCommitMessage, err = m.renderCommitMessageFunc(viewModel)
 	if err != nil {
 		return
 	}

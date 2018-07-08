@@ -1,10 +1,6 @@
 package config
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
-
 	"github.com/glenn-brown/golang-pkg-pcre/src/pkg/pcre"
 )
 
@@ -35,11 +31,9 @@ func (projConf *Project) GetBranchType(branchName string) string {
 	return ""
 }
 
-func regexMatchesString(pattern string, branchName string) bool {
-	return pcre.MustCompile(pattern, 0).MatcherString(branchName, 0).Matches()
-}
-
-func (projConf *Project) getValidators(branchType string) map[string]string {
+// GetValidator returns the validator that matches the given branch type
+// if no
+func (projConf *Project) GetValidator(branchType string) map[string]string {
 	var foundValidators map[string]string
 	for configBranchName, validators := range projConf.Validation {
 		if configBranchName == branchType || configBranchName == "*" && foundValidators == nil {
@@ -50,36 +44,6 @@ func (projConf *Project) getValidators(branchType string) map[string]string {
 	return foundValidators
 }
 
-// Validate validates the given commitMessage. It uses the validations configured for the given branchName.
-// As soon as one validation check succeeds, the validation passes.
-func (projConf *Project) Validate(branchName string, commitMessage string) error {
-
-	branchType := projConf.GetBranchType(branchName)
-	validators := projConf.getValidators(branchType)
-	if len(validators) == 0 {
-		return nil
-	}
-
-	for validationPattern := range validators {
-		if regexMatchesString(validationPattern, commitMessage) {
-			return nil
-		}
-	}
-
-	return prepareError(branchName, validators)
-
-}
-
-func prepareError(branchName string, validators map[string]string) error {
-	buffer := bytes.NewBufferString("validation error for branch ")
-	buffer.WriteString(fmt.Sprintf("'%s'\n", branchName))
-	buffer.WriteString("at least expected one of the following to match\n")
-
-	for _, validationDescription := range validators {
-		buffer.WriteString(" - ")
-		buffer.WriteString(validationDescription)
-		buffer.WriteString("\n")
-	}
-
-	return errors.New(buffer.String())
+func regexMatchesString(pattern string, branchName string) bool {
+	return pcre.MustCompile(pattern, 0).MatcherString(branchName, 0).Matches()
 }

@@ -8,12 +8,14 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+// UninstallCommand holds data and methods for 'uninstall' subcommand
 type UninstallCommand struct {
 	logger
 	loadConfiguration func() (*config.Configuration, error)
 	deleteFile        func(string) error
 }
 
+//NewUninstallerCommand creates a new uninstall subcommand
 func NewUninstallerCommand() *UninstallCommand {
 	return &UninstallCommand{
 		logger:            logger{stdoutWriter: os.Stdout},
