@@ -55,6 +55,9 @@ install: ## Install to <gopath>/src
 build-release: ## builds the checked out version into the .release/${tag} folder
 	.release/build.sh
 
+build-release-test: ## builds the checked out version into the .release/${tag} folder
+	.release/build.sh test
+
 # Self-Documented Makefile see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
