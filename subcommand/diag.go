@@ -10,6 +10,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+// NewDiagCommand create a new Diag SubCommand
 func NewDiagCommand() *DiagCommand {
 	return &DiagCommand{
 		logger: logger{os.Stdout},
@@ -20,6 +21,7 @@ func NewDiagCommand() *DiagCommand {
 	}
 }
 
+// DiagCommand holds data and implementation of the 'diag' sub command
 type DiagCommand struct {
 	logger
 	findConfigurationFilePath            func() (string, error)

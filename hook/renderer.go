@@ -7,6 +7,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+// CommitMessageRenderer renders a commit message by resolving the branch names template from project configuration
 type CommitMessageRenderer struct {
 	projConf config.Project
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/hook"
 )
 
+// NewTestCommand creates a new Test sub command
 func NewTestCommand() *TestCommand {
 	return &TestCommand{
 		logger: logger{os.Stdout},
@@ -20,6 +21,7 @@ func NewTestCommand() *TestCommand {
 	}
 }
 
+// TestCommand holds data and implementation of the 'test' sub command
 type TestCommand struct {
 	logger
 	findConfigurationFilePath              func() (string, error)

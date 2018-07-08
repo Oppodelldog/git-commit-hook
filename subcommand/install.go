@@ -8,6 +8,7 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+// NewInstallCommand creates a new InstallCommand
 func NewInstallCommand() *InstallCommand {
 	return &InstallCommand{
 		logger:            logger{os.Stdout},
@@ -16,6 +17,7 @@ func NewInstallCommand() *InstallCommand {
 	}
 }
 
+// InstallCommand holds data and implementation of the install sub command
 type InstallCommand struct {
 	logger
 	loadConfiguration func() (*config.Configuration, error)

@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"testing"
 
 	"reflect"
 
 	"path"
 
-	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/subcommand"
+	"github.com/Oppodelldog/git-commit-hook/testhelper"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
 const testPath = "/tmp/git-commit-hook"
@@ -76,7 +74,7 @@ func TestMain_ConfigurationNotFound(t *testing.T) {
 	defer restoreOriginals()
 
 	initTestFolder(t)
-	initGitRepository(t, featureBranch)
+	testhelper.InitGitRepository(t, featureBranch)
 
 	initialCommitMessage := "we expect this not to be changed by the tool"
 	setCommitMessage(t, initialCommitMessage)
@@ -192,7 +190,7 @@ func TestMain_ErrorCase_EmptyCommitMessageFileName(t *testing.T) {
 func TestMain_ErrorCase_CommitMessageFileNotFound(t *testing.T) {
 	defer restoreOriginals()
 	initTestFolder(t)
-	writeConfigFile(t, testPath)
+	testhelper.WriteConfigFile(t, testPath)
 
 	os.Args = []string{"git", commitMessageFile}
 	w, stdOutChannel := captureStdOut(t)
@@ -272,8 +270,8 @@ func captureStdOut(t *testing.T) (*os.File, chan string) {
 
 func initGitRepositoryWithBranchAndConfig(t *testing.T, branchName string) {
 	initTestFolder(t)
-	initGitRepository(t, branchName)
-	writeConfigFile(t, path.Join(testPath, ".git"))
+	testhelper.InitGitRepository(t, branchName)
+	testhelper.WriteConfigFile(t, path.Join(testPath, ".git"))
 }
 
 func initTestFolder(t *testing.T) {
@@ -290,57 +288,6 @@ func initTestFolder(t *testing.T) {
 	err = os.Chdir(testPath)
 	if err != nil {
 		t.Fatalf("Did not expect os.Chdir to return an error, but got: %v ", err)
-	}
-}
-
-func initGitRepository(t *testing.T, branchName string) {
-	git(t, "init")
-	err := ioutil.WriteFile("README.md", []byte("# test file"), 0777)
-	if err != nil {
-		t.Fatalf("could not write README.md: %v", err)
-	}
-	git(t, "config", "user.email", "odog@git-commit-hook.ok")
-	git(t, "config", "user.name", "odog")
-	git(t, "add", "-A")
-	git(t, "commit", "-m", "initial commit")
-	git(t, "checkout", "-b", branchName)
-}
-
-func writeConfigFile(t *testing.T, dir string) {
-	os.MkdirAll(dir, 0777)
-	cfg := config.Configuration{
-		"test project": config.Project{
-			Path: "/tmp/git-commit-hook/.git",
-			BranchTypes: map[string]config.BranchTypePattern{
-				"feature": `^feature/PROJECT-123$`,
-				"release": `^release.*$`,
-			},
-			Templates: map[string]config.BranchTypeTemplate{
-				"feature": "{{.BranchName}}: {{.CommitMessage}}",
-			},
-			Validation: map[string]config.BranchValidationConfiguration{
-				"release": {
-					"(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)": "valid ticket ID",
-				},
-			},
-		},
-	}
-
-	configBytes, err := yaml.Marshal(cfg)
-	if err != nil {
-		t.Fatalf("Did not expect yaml.Marshal to return an error, but got: %v ", err)
-	}
-
-	err = ioutil.WriteFile(path.Join(dir, "git-commit-hook.yaml"), configBytes, 0666)
-	if err != nil {
-		t.Fatalf("Did not expect ioutil.WriteFile to return an error, but got: %v ", err)
-	}
-}
-
-func git(t *testing.T, args ...string) {
-	o, err := exec.Command("git", args...).CombinedOutput()
-	if err != nil {
-		t.Fatalf("'git %v init' failed with error: %v - output: %s", args, err, string(o))
 	}
 }
 

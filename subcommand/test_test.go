@@ -12,6 +12,7 @@ import (
 
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/hook"
+	"github.com/Oppodelldog/git-commit-hook/testhelper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -267,7 +268,7 @@ func TestTestCommand_Test_ProjectNameNotFound_ShowsError(t *testing.T) {
 	defer cleanupTestEnvironment(t)
 	os.Args = []string{"programm name", "test", "-m", "test commit message", "-b", `"feature/PROJECT-123"`}
 	preapreTestEnvironment(t)
-	writeConfigFile(t, "/tmp/git-commit-hook/")
+	testhelper.WriteConfigFile(t, "/tmp/git-commit-hook/")
 	os.Chdir("/tmp/git-commit-hook/")
 
 	test := NewTestCommand()

@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// NewGitHookInstaller creates a new GitHookInstaller
 func NewGitHookInstaller() GitHookInstaller {
 	return &gitHookInstaller{
 		logger: logger{stdoutWriter: os.Stdout},
@@ -16,6 +17,7 @@ func NewGitHookInstaller() GitHookInstaller {
 }
 
 type (
+	// GitHookInstaller implements the installation of git-commit-hook into a repository
 	GitHookInstaller interface {
 		installForProject(gitFolderPath string, forceOverwrite bool) error
 	}
@@ -48,12 +50,7 @@ func (cmd *gitHookInstaller) installForProject(gitFolderPath string, forceOverwr
 		}
 	}
 
-	err = cmd.createSymlink(exeFile, commitHookFilePath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return cmd.createSymlink(exeFile, commitHookFilePath)
 }
 
 func checkFileExists(filePath string) bool {

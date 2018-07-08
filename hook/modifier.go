@@ -6,20 +6,22 @@ import (
 )
 
 type (
+	// CommitMessageModifier implements the modification of a given commit message and the current branch name.
 	CommitMessageModifier interface {
 		ModifyGitCommitMessage(gitCommitMessage, branchName string) (modifiedCommitMessage string, err error)
 	}
 	commitMessageModifier struct {
-		createViewModelFunc       CreateViewModelFuncDef
-		renderCommitMessageFunc   RenderCommitMessageFuncDef
-		validateCommitmessageFunc ValidateCommitMessageFuncDef
+		createViewModelFunc       createViewModelFuncDef
+		renderCommitMessageFunc   renderCommitMessageFuncDef
+		validateCommitmessageFunc validateCommitMessageFuncDef
 	}
 
-	CreateViewModelFuncDef       func(gitCommitMessage string, branchName string) ViewModel
-	ValidateCommitMessageFuncDef func(branchName, modifiedCommitMessage string) error
-	RenderCommitMessageFuncDef   func(branchName string, viewModel ViewModel) (string, error)
+	createViewModelFuncDef       func(gitCommitMessage string, branchName string) ViewModel
+	validateCommitMessageFuncDef func(branchName, modifiedCommitMessage string) error
+	renderCommitMessageFuncDef   func(branchName string, viewModel ViewModel) (string, error)
 )
 
+// NewCommitMessageModifier create a CommitMessageModifier
 func NewCommitMessageModifier(projectConfiguration config.Project) CommitMessageModifier {
 	commitMessageRenderer := &CommitMessageRenderer{projectConfiguration}
 	return &commitMessageModifier{

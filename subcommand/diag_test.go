@@ -3,15 +3,13 @@ package subcommand
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"os"
-	"path"
 	"strings"
 	"testing"
 
 	"github.com/Oppodelldog/git-commit-hook/config"
+	"github.com/Oppodelldog/git-commit-hook/testhelper"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
 const testDir = "/tmp/git-commit-hook/subcommand"
@@ -133,40 +131,9 @@ func cleanupTestEnvironment(t *testing.T) {
 }
 
 func preapreTestEnvironment(t *testing.T) {
-	writeConfigFile(t, testDir)
+	testhelper.WriteConfigFile(t, testDir)
 	err := os.Chdir(testDir)
 	if err != nil {
 		t.Fatalf("Error preparing test environment.Did not expect os.Chdir to return an error, but got: %v ", err)
-	}
-}
-
-func writeConfigFile(t *testing.T, dir string) {
-	os.MkdirAll(dir, 0777)
-	cfg := config.Configuration{
-		"test project": config.Project{
-			Path: "/tmp/git-commit-hook/subcommand/.git",
-			BranchTypes: map[string]config.BranchTypePattern{
-				"feature": `^feature/PROJECT-123$`,
-				"release": `^release.*$`,
-			},
-			Templates: map[string]config.BranchTypeTemplate{
-				"feature": "{{.BranchName}}: {{.CommitMessage}}",
-			},
-			Validation: map[string]config.BranchValidationConfiguration{
-				"release": {
-					"(?m)(?:\\s|^|/)(([A-Z](_)*)+-[0-9]+)([\\s,;:!.-]|$)": "valid ticket ID",
-				},
-			},
-		},
-	}
-
-	configBytes, err := yaml.Marshal(cfg)
-	if err != nil {
-		t.Fatalf("Did not expect yaml.Marshal to return an error, but got: %v ", err)
-	}
-
-	err = ioutil.WriteFile(path.Join(dir, "git-commit-hook.yaml"), configBytes, 0666)
-	if err != nil {
-		t.Fatalf("Did not expect ioutil.WriteFile to return an error, but got: %v ", err)
 	}
 }
