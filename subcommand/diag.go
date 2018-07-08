@@ -72,11 +72,11 @@ func (cmd *DiagCommand) Diagnostics() int {
 func (cmd *DiagCommand) printProjectConfiguration(projectName string, projectConfiguration config.Project) {
 	cmd.stdout("project:", projectName)
 	cmd.stdout("path   :", projectConfiguration.Path)
-	cmd.stdout("\nbranch types:")
+	cmd.stdout("\nbranch types:\n")
 	cmd.printConfigurationMap(projectConfiguration.BranchTypes)
-	cmd.stdout("\nbranch type templates:")
+	cmd.stdout("\nbranch type templates:\n")
 	cmd.printConfigurationMap(projectConfiguration.Templates)
-	cmd.stdout("\nbranch type validation:")
+	cmd.stdout("\nbranch type validation:\n")
 	cmd.printConfigurationMap(projectConfiguration.Validation)
 }
 
@@ -92,18 +92,18 @@ func (cmd *DiagCommand) printConfigurationMap(m interface{}) {
 	for _, k := range keys {
 		switch v := m.(type) {
 		case map[string]config.BranchTypePattern:
-			cmd.stdout("\t", k, ":", v[k])
+			cmd.stdout("\t", k, ":", v[k],"\n")
 		case map[string]config.BranchTypeTemplate:
-			cmd.stdout("\t", k, ":", v[k])
+			cmd.stdout("\t", k, ":", v[k],"\n")
 		case map[string]config.BranchValidationConfiguration:
-			cmd.stdout("\t", k, ":")
+			cmd.stdout("\t", k, ":","\n")
 			var keys2 []string
 			for k2 := range v[k] {
 				keys2 = append(keys2, k2)
 			}
 			sort.Strings(keys)
 			for _, k2 := range keys2 {
-				cmd.stdout("\t\t", k2, ":", v[k][k2])
+				cmd.stdout("\t\t", k2, ":", v[k][k2],"\n")
 			}
 		}
 	}

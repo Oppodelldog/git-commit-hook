@@ -29,7 +29,8 @@ func TestTestCommand_Test_HappyPath(t *testing.T) {
 	expectedOutput := `
 testing configuration '/tmp/git-commit-hook/git-commit-hook.yaml':
 project        : test project
-branch         : "feature/PROJECT-123"
+branch name    : "feature/PROJECT-123"
+branch type    : 
 commit message : test commit message
 
 would generate the following commit message:
@@ -230,7 +231,8 @@ func TestTestCommand_Test_BranchNameMissingButWorkingDirIsGitRepo(t *testing.T) 
 	expectedOutput := `
 testing configuration '/tmp/git-commit-hook/git-commit-hook.yaml':
 project        : test project
-branch         : feature/FROM-GIT (current git branch)
+branch name    : feature/FROM-GIT (current git branch)
+branch type    : 
 commit message : test commit message
 
 would generate the following commit message:
@@ -279,7 +281,8 @@ func TestTestCommand_Test_CommitMessageModifierReturnsError_ShowError(t *testing
 	expectedOutput := `
 testing configuration '/tmp/git-commit-hook/git-commit-hook.yaml':
 project        : test project
-branch         : "feature/PROJECT-123"
+branch name    : "feature/PROJECT-123"
+branch type    : 
 commit message : test commit message
 
 some error while modifying the commit mesage

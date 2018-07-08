@@ -104,7 +104,7 @@ func TestLoadProjectConfiguration(t *testing.T) {
 			},
 		},
 		"config not found": {
-			expectedErrorMessage: "could not find config file at",
+			expectedErrorMessage: "project configuration not found for path",
 			prepare:              func() {
 				testhelper.InitTestFolder(t)
 			},

@@ -24,9 +24,17 @@ func TestDiagCommand_Diagnostics(t *testing.T) {
 git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 -------------------------------------------------------------------
 project:test projectpath   :/tmp/git-commit-hook/.git
-branch types:	feature:^feature/PROJECT-123$	release:^release.*$
-branch type templates:	feature:{{.BranchName}}: {{.CommitMessage}}
-branch type validation:	release:		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
+branch types:
+	feature:^feature/PROJECT-123$
+	release:^release.*$
+
+branch type templates:
+	feature:{{.BranchName}}: {{.CommitMessage}}
+
+branch type validation:
+	release:
+		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
+
 git-commit-hook installed: NO
 `
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), diag.stdoutWriter.(*bytes.Buffer).String())
@@ -48,9 +56,17 @@ func TestDiagCommand_Diagnostics_CommitHookIsAlreadyInstalled(t *testing.T) {
 git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 -------------------------------------------------------------------
 project:test projectpath   :/tmp/git-commit-hook/.git
-branch types:	feature:^feature/PROJECT-123$	release:^release.*$
-branch type templates:	feature:{{.BranchName}}: {{.CommitMessage}}
-branch type validation:	release:		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
+branch types:
+	feature:^feature/PROJECT-123$
+	release:^release.*$
+
+branch type templates:
+	feature:{{.BranchName}}: {{.CommitMessage}}
+
+branch type validation:
+	release:
+		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
+
 git-commit-hook installed: YES
 `
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), diag.stdoutWriter.(*bytes.Buffer).String())
@@ -73,9 +89,17 @@ func TestDiagCommand_Diagnostics_AnotherCommitHookIsAlreadyInstalled(t *testing.
 git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 -------------------------------------------------------------------
 project:test projectpath   :/tmp/git-commit-hook/.git
-branch types:	feature:^feature/PROJECT-123$	release:^release.*$
-branch type templates:	feature:{{.BranchName}}: {{.CommitMessage}}
-branch type validation:	release:		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
+branch types:
+	feature:^feature/PROJECT-123$
+	release:^release.*$
+
+branch type templates:
+	feature:{{.BranchName}}: {{.CommitMessage}}
+
+branch type validation:
+	release:
+		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
+
 git-commit-hook installed: NO, another commit-msg hook is installed
 `
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), diag.stdoutWriter.(*bytes.Buffer).String())

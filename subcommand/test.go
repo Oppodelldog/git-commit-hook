@@ -85,7 +85,8 @@ func (cmd *TestCommand) Test() int {
 	if projectName != "" {
 		cmd.stdoutf("project        : %s\n", projectName)
 	}
-	cmd.stdoutf("branch         : %s\n", branchName)
+	cmd.stdoutf("branch name    : %s\n", branchName)
+	cmd.stdoutf("branch type    : %s\n", projectConfiguration.GetBranchType(branchName))
 	cmd.stdoutf("commit message : %s\n", commitMessage)
 	cmd.stdout("\n")
 

@@ -88,7 +88,7 @@ func TestMain_ConfigurationNotFound(t *testing.T) {
 	w.Close()
 
 	stdOutput := <-stdOutChannel
-	assert.Contains(t, stdOutput, "could not find config file")
+	assert.Contains(t, stdOutput, "project configuration not found for path")
 	assertCommitMessage(t, initialCommitMessage)
 }
 
