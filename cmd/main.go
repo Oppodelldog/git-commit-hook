@@ -18,7 +18,7 @@ type exitFuncDef func(code int)
 var diagnosticsFunc = callWithIntResult(subcommand.NewDiagCommand().Diagnostics)
 var testFunc = callWithIntResult(subcommand.NewTestCommand().Test)
 var installFunc = callWithIntResult(subcommand.NewInstallCommand().Install)
-var uninstallFunc = callWithIntResult(subcommand.Uninstall)
+var uninstallFunc = callWithIntResult(subcommand.NewUninstallerCommand().Uninstall)
 var rewriteCommitMessageFunc = rewriteCommitMessageFuncDef(hook.RewriteCommitMessage)
 var exitFunc = exitFuncDef(os.Exit)
 

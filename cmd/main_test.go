@@ -239,7 +239,7 @@ func TestMain_InstallFuncMappedCorrectly(t *testing.T) {
 }
 
 func TestMain_UnnstallFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(subcommand.Uninstall).Pointer(), reflect.ValueOf(uninstallFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.NewUninstallerCommand().Uninstall).Pointer(), reflect.ValueOf(uninstallFunc).Pointer())
 }
 func assertProgramExistsWith(t *testing.T, expectedExitCode int) {
 	exitFunc = func(exitCode int) {

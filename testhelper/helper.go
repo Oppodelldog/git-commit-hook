@@ -13,6 +13,8 @@ import (
 
 //TestPath holds the absolute path to the test folder
 const TestPath = "/tmp/git-commit-hook"
+const TestPathGitFolder = "/tmp/git-commit-hook/.git"
+const TestPathHooksFolder = "/tmp/git-commit-hook/.git/hooks"
 
 //InitGitRepository initializes a test git repository with the given branch name in the current directory
 func InitGitRepository(t *testing.T, branchName string) {
@@ -38,7 +40,7 @@ func WriteConfigFile(t *testing.T, dir string) {
 	}
 	cfg := config.Configuration{
 		"test project": config.Project{
-			Path: "/tmp/git-commit-hook/.git",
+			Path: TestPathGitFolder,
 			BranchTypes: map[string]config.BranchTypePattern{
 				"feature": `^feature/PROJECT-123$`,
 				"release": `^release.*$`,
