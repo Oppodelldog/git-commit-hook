@@ -36,5 +36,5 @@ func (c *Configuration) GetProjectByName(projectName string) (Project, error) {
 		}
 	}
 
-	return Project{}, fmt.Errorf("project c not found for project name '%s'", projectName)
+	return Project{}, fmt.Errorf("project configuration not found for project name '%s'", projectName)
 }

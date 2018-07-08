@@ -10,6 +10,8 @@ import (
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+const gitCommitMessageHookName = "commit-msg"
+
 func loadProjectConfiguration() (config.Project, error) {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -21,7 +23,7 @@ func loadProjectConfiguration() (config.Project, error) {
 }
 
 func createCommitHookFilePath(gitFolderPath string) string {
-	const gitCommitMessageHookName = "commit-msg"
+
 	commitHookFilePath := path.Join(gitFolderPath, "hooks", gitCommitMessageHookName)
 	return commitHookFilePath
 }

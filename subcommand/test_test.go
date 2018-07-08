@@ -100,13 +100,13 @@ func TestTestCommand_Test_ConfigCannotBeFound(t *testing.T) {
 	preapreTestEnvironment(t)
 
 	test := NewTestCommand()
-	test.findConfigurationFilePath = func() (string, error) { return "", errors.New("config path not found") }
+	test.findConfigurationFilePath = func() (string, error) { return "", errors.New("configuration path not found") }
 	test.stdoutWriter = bytes.NewBufferString("")
 
 	res := test.Test()
 
 	expectedOutput := `
-error while searching config file: config path not found
+error while searching configuration file: configuration path not found
 `
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), test.stdoutWriter.(*bytes.Buffer).String())
 	assert.Exactly(t, 1, res)

@@ -100,7 +100,7 @@ func TestDiagCommand_Diagnostics_ConfigFilePathCannotBeFound(t *testing.T) {
 	res := diag.Diagnostics()
 
 	expectedOutput := `
-error while searching config file: some error
+error while searching configuration file: some error
 `
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), diag.stdoutWriter.(*bytes.Buffer).String())
 	assert.Exactly(t, 1, res)

@@ -3,99 +3,88 @@ package subcommand
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"os"
 
 	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
+func NewInstallCommand() *InstallCommand {
+	return &InstallCommand{
+		logger:            logger{os.Stdout},
+		loadConfiguration: config.LoadConfiguration,
+		gitHookInstaller:  NewGitHookInstaller(),
+	}
+}
+
+type InstallCommand struct {
+	logger
+	loadConfiguration func() (*config.Configuration, error)
+	gitHookInstaller  GitHookInstaller
+}
+
 // Install subcommand installs the git-commit-hook in configured git repositories
-func Install() int {
+func (cmd *InstallCommand) Install() int {
 	var projectName string
 	var allFlag bool
 	var forceOverwrite bool
 	flagSet := flag.NewFlagSet("git-commit-hook install", flag.ContinueOnError)
+	flagSet.SetOutput(cmd.stdoutWriter)
 	flagSet.StringVar(&projectName, "p", "", `project name`)
 	flagSet.BoolVar(&allFlag, "a", false, `all`)
 	flagSet.BoolVar(&forceOverwrite, "f", false, `force file creation by overwriting`)
 	err := flagSet.Parse(os.Args[2:])
 	if err != nil {
-		fmt.Printf("git-commit-hook install error: %v\n", err)
 		return 1
 	}
 
-	configuration, err := config.LoadConfiguration()
+	configuration, err := cmd.loadConfiguration()
 	if err != nil {
-		fmt.Println(err)
+		cmd.stdout(err, "\n")
 		return 1
 	}
 
 	if projectName != "" {
-		projectConfiguraiton, err := configuration.GetProjectByName(projectName)
+		projectConfiguration, err := configuration.GetProjectByName(projectName)
 		if err != nil {
-			fmt.Println(err)
+			cmd.stdout(err, "\n")
 			return 1
 		}
-		err = installForProject(projectConfiguraiton.Path, forceOverwrite)
+		cmd.stdoutf("installing git-commit-hook to '%s': ", projectConfiguration.Path)
+		err = cmd.gitHookInstaller.installForProject(projectConfiguration.Path, forceOverwrite)
 		if err != nil {
-			fmt.Println(err)
+			cmd.stdout(err, "\n")
 			return 1
 		}
+		cmd.stdout("OK", "\n")
+
 	} else if allFlag {
-		err := installForAllProjects(configuration, forceOverwrite)
+		err := cmd.installForAllProjects(configuration, forceOverwrite)
 		if err != nil {
-			fmt.Println(err)
+			cmd.stdout(err, "\n")
 			return 1
 		}
 	} else {
-		flagSet.PrintDefaults()
+		flagSet.Usage()
+		return 1
 	}
 
 	return 0
 }
 
-func installForAllProjects(configuration *config.Configuration, forceOverwrite bool) error {
+func (cmd *InstallCommand) installForAllProjects(configuration *config.Configuration, forceOverwrite bool) error {
 	var hasErrors bool
 	for _, projectConfiguration := range *configuration {
-		err := installForProject(projectConfiguration.Path, forceOverwrite)
+		cmd.stdoutf("installing git-commit-hook to '%s': ", projectConfiguration.Path)
+		err := cmd.gitHookInstaller.installForProject(projectConfiguration.Path, forceOverwrite)
 		if err != nil {
+			cmd.stdout(err, "\n")
 			hasErrors = true
+		}else {
+			cmd.stdout("OK", "\n")
 		}
 	}
 	if hasErrors {
 		return errors.New("done with errors")
 	}
-	return nil
-}
-
-func installForProject(gitFolderPath string, forceOverwrite bool) error {
-
-	exeFile, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	commitHookFilePath := createCommitHookFilePath(gitFolderPath)
-
-	fmt.Printf("installing git-commit-hook to '%s': ", commitHookFilePath)
-
-	if _, err = os.Stat(commitHookFilePath); err == nil {
-		if !forceOverwrite {
-			fmt.Println("file already exists, use -f to force overwriting")
-			return nil
-		}
-		err = os.Remove(commitHookFilePath)
-		if err != nil {
-			fmt.Println(err)
-			return nil
-		}
-	}
-
-	err = os.Symlink(exeFile, commitHookFilePath)
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	fmt.Println("OK")
 	return nil
 }

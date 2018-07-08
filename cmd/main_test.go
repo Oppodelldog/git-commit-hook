@@ -238,7 +238,7 @@ func TestMain_TestFuncMappedCorrectly(t *testing.T) {
 }
 
 func TestMain_InstallFuncMappedCorrectly(t *testing.T) {
-	assert.Exactly(t, reflect.ValueOf(subcommand.Install).Pointer(), reflect.ValueOf(installFunc).Pointer())
+	assert.Exactly(t, reflect.ValueOf(subcommand.NewInstallCommand().Install).Pointer(), reflect.ValueOf(installFunc).Pointer())
 }
 
 func TestMain_UnnstallFuncMappedCorrectly(t *testing.T) {

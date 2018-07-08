@@ -2,10 +2,7 @@ package subcommand
 
 import (
 	"flag"
-	"fmt"
 	"os"
-
-	"io"
 
 	"github.com/Oppodelldog/git-commit-hook/config"
 	"github.com/Oppodelldog/git-commit-hook/git"
@@ -14,7 +11,7 @@ import (
 
 func NewTestCommand() *TestCommand {
 	return &TestCommand{
-		stdoutWriter:                           io.Writer(os.Stdout),
+		logger:                                 logger{os.Stdout},
 		findConfigurationFilePath:              config.FindConfigurationFilePath,
 		loadConfiguration:                      config.LoadConfiguration,
 		loadProjectConfigurationByName:         config.LoadProjectConfigurationByName,
@@ -24,7 +21,7 @@ func NewTestCommand() *TestCommand {
 }
 
 type TestCommand struct {
-	stdoutWriter                           io.Writer
+	logger
 	findConfigurationFilePath              func() (string, error)
 	loadConfiguration                      func() (*config.Configuration, error)
 	loadProjectConfigurationByName         func(string) (config.Project, error)
@@ -51,7 +48,7 @@ func (cmd *TestCommand) Test() int {
 
 	configurationFilePath, err := cmd.findConfigurationFilePath()
 	if err != nil {
-		cmd.stdoutf("error while searching config file: %v\n", err)
+		cmd.stdoutf("error while searching configuration file: %v\n", err)
 		return 1
 	}
 
@@ -102,14 +99,6 @@ func (cmd *TestCommand) Test() int {
 	cmd.stdoutf("would generate the following commit message:\n%v\n", modifiedCommitMessage)
 
 	return 0
-}
-
-func (cmd *TestCommand) stdout(i ...interface{}) {
-	fmt.Fprint(cmd.stdoutWriter, i...)
-}
-
-func (cmd *TestCommand) stdoutf(format string, i ...interface{}) {
-	fmt.Fprintf(cmd.stdoutWriter, format, i...)
 }
 
 func newCommitMessageModifier(projectConfiguration config.Project) hook.CommitMessageModifier {

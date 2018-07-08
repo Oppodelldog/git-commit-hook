@@ -1,17 +1,15 @@
 package subcommand
 
 import (
-	"fmt"
-	"io"
-	"os"
 	"sort"
 
 	"github.com/Oppodelldog/git-commit-hook/config"
+	"os"
 )
 
 func NewDiagCommand() *DiagCommand {
 	return &DiagCommand{
-		stdoutWriter:                         io.Writer(os.Stdout),
+		logger:                               logger{os.Stdout},
 		findConfigurationFilePath:            config.FindConfigurationFilePath,
 		loadConfiguration:                    config.LoadConfiguration,
 		checkIsCommitHookInstalledAtPath:     isCommitHookInstalled,
@@ -20,7 +18,7 @@ func NewDiagCommand() *DiagCommand {
 }
 
 type DiagCommand struct {
-	stdoutWriter                         io.Writer
+	logger
 	findConfigurationFilePath            func() (string, error)
 	loadConfiguration                    func() (*config.Configuration, error)
 	checkIsCommitHookInstalledAtPath     func(string) bool
@@ -32,7 +30,7 @@ func (cmd *DiagCommand) Diagnostics() int {
 
 	configurationFilePath, err := cmd.findConfigurationFilePath()
 	if err != nil {
-		cmd.stdoutf("error while searching config file: %v\n", err)
+		cmd.stdoutf("error while searching configuration file: %v\n", err)
 		return 1
 	}
 
@@ -116,12 +114,4 @@ func (cmd *DiagCommand) printBranchValidation(m map[string]config.BranchValidati
 			cmd.stdout("\t\t", k2, ":", m[k][k2])
 		}
 	}
-}
-
-func (cmd *DiagCommand) stdout(i ...interface{}) {
-	fmt.Fprint(cmd.stdoutWriter, i...)
-}
-
-func (cmd *DiagCommand) stdoutf(format string, i ...interface{}) {
-	fmt.Fprintf(cmd.stdoutWriter, format, i...)
 }
