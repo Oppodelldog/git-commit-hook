@@ -43,7 +43,7 @@ git-commit-hook installed: NO
 
 func TestDiagCommand_Diagnostics_CommitHookIsAlreadyInstalled(t *testing.T) {
 	defer testhelper.CleanupTestEnvironment(t)
-
+	testhelper.CleanupTestEnvironment(t)
 	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()

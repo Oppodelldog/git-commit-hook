@@ -72,6 +72,7 @@ func TestMain_HappyPath(t *testing.T) {
 func TestMain_ConfigurationNotFound(t *testing.T) {
 	defer restoreOriginals()
 	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
 	testhelper.InitTestFolder(t)
 	testhelper.InitGitRepository(t, featureBranch)
 
@@ -88,7 +89,7 @@ func TestMain_ConfigurationNotFound(t *testing.T) {
 	w.Close()
 
 	stdOutput := <-stdOutChannel
-	assert.Contains(t, stdOutput, "project configuration not found for path")
+	assert.Contains(t, stdOutput, "could not find config file at")
 	assertCommitMessage(t, initialCommitMessage)
 }
 
