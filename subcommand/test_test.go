@@ -114,7 +114,7 @@ error while searching configuration file: configuration path not found
 
 func TestTestCommand_Test_LoadProjectConfiguration(t *testing.T) {
 	originArgs := os.Args
-	os.Args = []string{"programm name", "test", "-m", "test commit", "-b", `"feature/PROJ-123"`}
+	baseOsArgs := []string{"programm name", "test", "-m", "test commit", "-b", `"feature/PROJ-123"`}
 	defer func() { os.Args = originArgs }()
 	defer cleanupTestEnvironment(t)
 	preapreTestEnvironment(t)
@@ -131,7 +131,7 @@ func TestTestCommand_Test_LoadProjectConfiguration(t *testing.T) {
 
 	for testCaseName, testData := range testDataSet {
 		t.Run(testCaseName, func(t *testing.T) {
-			os.Args = append(os.Args, testData.parameters...)
+			os.Args = append(baseOsArgs, testData.parameters...)
 			test := NewTestCommand()
 			loadProjectConfigurationByNameCalled := false
 			test.loadProjectConfigurationByName = func(p string) (config.Project, error) {
