@@ -5,9 +5,7 @@ import (
 
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/Oppodelldog/git-commit-hook/config"
@@ -20,8 +18,8 @@ func TestTestCommand_Test_HappyPath(t *testing.T) {
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test", "-m", "test commit message", "-b", `"feature/PROJECT-123"`, "-p", "test project"}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	test := NewTestCommand()
 	test.stdoutWriter = bytes.NewBufferString("")
@@ -29,7 +27,7 @@ func TestTestCommand_Test_HappyPath(t *testing.T) {
 	res := test.Test()
 
 	expectedOutput := `
-testing configuration '/tmp/git-commit-hook/subcommand/git-commit-hook.yaml':
+testing configuration '/tmp/git-commit-hook/git-commit-hook.yaml':
 project        : test project
 branch         : "feature/PROJECT-123"
 commit message : test commit message
@@ -45,8 +43,8 @@ func TestTestCommand_Test_TooFewParameters_PrintUsage(t *testing.T) {
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test"}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	test := NewTestCommand()
 	test.stdoutWriter = bytes.NewBufferString("")
@@ -71,8 +69,8 @@ func TestTestCommand_Test_InvalidParameters_PrintUsageAndErrorMessage(t *testing
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test", "--unknown-parameter"}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	test := NewTestCommand()
 	test.stdoutWriter = bytes.NewBufferString("")
@@ -97,8 +95,8 @@ func TestTestCommand_Test_ConfigCannotBeFound(t *testing.T) {
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test", ""}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	test := NewTestCommand()
 	test.findConfigurationFilePath = func() (string, error) { return "", errors.New("configuration path not found") }
@@ -117,8 +115,8 @@ func TestTestCommand_Test_LoadProjectConfiguration(t *testing.T) {
 	originArgs := os.Args
 	baseOsArgs := []string{"programm name", "test", "-m", "test commit", "-b", `"feature/PROJ-123"`}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	expectedProjectName := "sampleProject"
 
@@ -166,8 +164,8 @@ func TestTestCommand_Test_LoadProjectConfigurationReturnsError_ExpectError(t *te
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test", "-m", "test commit"}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	expectedProjectName := "sampleProject"
 
@@ -201,8 +199,8 @@ func TestTestCommand_Test_BranchNameMissingAndWorkingDirIsNotGitRepo_ShowsError(
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test", "-m", "test commit message", "-p", "test project"}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	test := NewTestCommand()
 	test.stdoutWriter = bytes.NewBufferString("")
@@ -220,9 +218,9 @@ func TestTestCommand_Test_BranchNameMissingButWorkingDirIsGitRepo(t *testing.T) 
 	originArgs := os.Args
 	os.Args = []string{"programm name", "test", "-m", "test commit message", "-p", "test project"}
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	preapreTestEnvironment(t)
-	initGitRepository(t, "feature/FROM-GIT")
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
+	testhelper.InitGitRepository(t, "feature/FROM-GIT")
 
 	test := NewTestCommand()
 	test.stdoutWriter = bytes.NewBufferString("")
@@ -230,7 +228,7 @@ func TestTestCommand_Test_BranchNameMissingButWorkingDirIsGitRepo(t *testing.T) 
 	res := test.Test()
 
 	expectedOutput := `
-testing configuration '/tmp/git-commit-hook/subcommand/git-commit-hook.yaml':
+testing configuration '/tmp/git-commit-hook/git-commit-hook.yaml':
 project        : test project
 branch         : feature/FROM-GIT (current git branch)
 commit message : test commit message
@@ -242,34 +240,13 @@ test commit message
 	assert.Exactly(t, 0, res)
 }
 
-func gitCmd(t *testing.T, args ...string) {
-	o, err := exec.Command("git", args...).CombinedOutput()
-	if err != nil {
-		t.Fatalf("'git %v init' failed with error: %v - output: %s", args, err, string(o))
-	}
-}
-
-func initGitRepository(t *testing.T, branchName string) {
-	gitCmd(t, "init")
-	err := ioutil.WriteFile("README.md", []byte("# test file"), 0777)
-	if err != nil {
-		t.Fatalf("could not write README.md: %v", err)
-	}
-	gitCmd(t, "config", "user.email", "odog@git-commit-hook.ok")
-	gitCmd(t, "config", "user.name", "odog")
-	gitCmd(t, "add", "-A")
-	gitCmd(t, "commit", "-m", "initial commit")
-	gitCmd(t, "checkout", "-b", branchName)
-}
-
 func TestTestCommand_Test_ProjectNameNotFound_ShowsError(t *testing.T) {
 	originArgs := os.Args
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
-	os.Args = []string{"programm name", "test", "-m", "test commit message", "-b", `"feature/PROJECT-123"`}
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	os.Args = []string{"programm name", "test", "-m", "test commit message", "-b", `"feature/PROJECT-123"`, "-p", "unknown project"}
+	testhelper.PreapreTestEnvironment(t)
 	testhelper.WriteConfigFile(t, "/tmp/git-commit-hook/")
-	os.Chdir("/tmp/git-commit-hook/")
 
 	test := NewTestCommand()
 	test.stdoutWriter = bytes.NewBufferString("")
@@ -277,8 +254,9 @@ func TestTestCommand_Test_ProjectNameNotFound_ShowsError(t *testing.T) {
 	res := test.Test()
 
 	expectedOutput := `
-project configuration not found for path '/tmp/git-commit-hook/.git'
+project configuration not found for project name 'unknown project'
 `
+
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), test.stdoutWriter.(*bytes.Buffer).String())
 	assert.Exactly(t, 1, res)
 }
@@ -286,9 +264,9 @@ project configuration not found for path '/tmp/git-commit-hook/.git'
 func TestTestCommand_Test_CommitMessageModifierReturnsError_ShowError(t *testing.T) {
 	originArgs := os.Args
 	defer func() { os.Args = originArgs }()
-	defer cleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	os.Args = []string{"programm name", "test", "-m", "test commit message", "-b", `"feature/PROJECT-123"`, "-p", "test project"}
-	preapreTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	test := NewTestCommand()
 	test.newCommitMessageModifier = func(project config.Project) hook.CommitMessageModifier {
@@ -299,7 +277,7 @@ func TestTestCommand_Test_CommitMessageModifierReturnsError_ShowError(t *testing
 	res := test.Test()
 
 	expectedOutput := `
-testing configuration '/tmp/git-commit-hook/subcommand/git-commit-hook.yaml':
+testing configuration '/tmp/git-commit-hook/git-commit-hook.yaml':
 project        : test project
 branch         : "feature/PROJECT-123"
 commit message : test commit message

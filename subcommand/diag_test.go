@@ -3,7 +3,6 @@ package subcommand
 import (
 	"bytes"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 
@@ -12,12 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testDir = "/tmp/git-commit-hook/subcommand"
+const testDir = "/tmp/git-commit-hook"
 
 func TestDiagCommand_Diagnostics(t *testing.T) {
-	defer cleanupTestEnvironment(t)
-
-	preapreTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()
 	diag.stdoutWriter = bytes.NewBufferString("")
@@ -25,9 +23,9 @@ func TestDiagCommand_Diagnostics(t *testing.T) {
 	res := diag.Diagnostics()
 
 	expectedOutput := `
-git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/subcommand/git-commit-hook.yaml
+git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 -------------------------------------------------------------------
-project:test projectpath   :/tmp/git-commit-hook/subcommand/.git
+project:test projectpath   :/tmp/git-commit-hook/.git
 branch types:	feature:^feature/PROJECT-123$	release:^release.*$
 branch type templates:	feature:{{.BranchName}}: {{.CommitMessage}}
 branch type validation:	release:		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
@@ -38,9 +36,9 @@ git-commit-hook installed: NO
 }
 
 func TestDiagCommand_Diagnostics_CommitHookIsAlreadyInstalled(t *testing.T) {
-	defer cleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 
-	preapreTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()
 	diag.stdoutWriter = bytes.NewBufferString("")
@@ -49,9 +47,9 @@ func TestDiagCommand_Diagnostics_CommitHookIsAlreadyInstalled(t *testing.T) {
 	res := diag.Diagnostics()
 
 	expectedOutput := `
-git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/subcommand/git-commit-hook.yaml
+git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 -------------------------------------------------------------------
-project:test projectpath   :/tmp/git-commit-hook/subcommand/.git
+project:test projectpath   :/tmp/git-commit-hook/.git
 branch types:	feature:^feature/PROJECT-123$	release:^release.*$
 branch type templates:	feature:{{.BranchName}}: {{.CommitMessage}}
 branch type validation:	release:		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
@@ -62,9 +60,9 @@ git-commit-hook installed: YES
 }
 
 func TestDiagCommand_Diagnostics_AnotherCommitHookIsAlreadyInstalled(t *testing.T) {
-	defer cleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 
-	preapreTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()
 	diag.stdoutWriter = bytes.NewBufferString("")
@@ -74,9 +72,9 @@ func TestDiagCommand_Diagnostics_AnotherCommitHookIsAlreadyInstalled(t *testing.
 	res := diag.Diagnostics()
 
 	expectedOutput := `
-git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/subcommand/git-commit-hook.yaml
+git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 -------------------------------------------------------------------
-project:test projectpath   :/tmp/git-commit-hook/subcommand/.git
+project:test projectpath   :/tmp/git-commit-hook/.git
 branch types:	feature:^feature/PROJECT-123$	release:^release.*$
 branch type templates:	feature:{{.BranchName}}: {{.CommitMessage}}
 branch type validation:	release:		(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$):valid ticket ID
@@ -87,9 +85,9 @@ git-commit-hook installed: NO, another commit-msg hook is installed
 }
 
 func TestDiagCommand_Diagnostics_ConfigFilePathCannotBeFound(t *testing.T) {
-	defer cleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 
-	preapreTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()
 	diag.stdoutWriter = bytes.NewBufferString("")
@@ -105,9 +103,9 @@ error while searching configuration file: some error
 }
 
 func TestDiagCommand_Diagnostics_ConfigCannotBeLoad(t *testing.T) {
-	defer cleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 
-	preapreTestEnvironment(t)
+	testhelper.PreapreTestEnvironment(t)
 
 	diag := NewDiagCommand()
 	diag.stdoutWriter = bytes.NewBufferString("")
@@ -116,24 +114,9 @@ func TestDiagCommand_Diagnostics_ConfigCannotBeLoad(t *testing.T) {
 	res := diag.Diagnostics()
 
 	expectedOutput := `
-git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/subcommand/git-commit-hook.yaml
+git-commit-hook diagnosticsload configuration: /tmp/git-commit-hook/git-commit-hook.yaml
 error loading configuration: some error
 `
 	assert.Exactly(t, strings.TrimLeft(expectedOutput, "\n"), diag.stdoutWriter.(*bytes.Buffer).String())
 	assert.Exactly(t, 1, res)
-}
-
-func cleanupTestEnvironment(t *testing.T) {
-	err := os.RemoveAll(testDir)
-	if err != nil {
-		t.Fatalf("Error cleaning up test environment.. Did not expect os.RemoveAll to return an error, but got: %v ", err)
-	}
-}
-
-func preapreTestEnvironment(t *testing.T) {
-	testhelper.WriteConfigFile(t, testDir)
-	err := os.Chdir(testDir)
-	if err != nil {
-		t.Fatalf("Error preparing test environment.Did not expect os.Chdir to return an error, but got: %v ", err)
-	}
 }

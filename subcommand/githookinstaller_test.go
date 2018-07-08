@@ -7,12 +7,13 @@ import (
 	"path"
 	"testing"
 
+	"github.com/Oppodelldog/git-commit-hook/testhelper"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGitHookInstaller_Install(t *testing.T) {
-	cleanupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	gitFolder := path.Join(testDir, ".git")
 	gitHooksDir := path.Join(gitFolder, "hooks")
 	gitHookFilePath := path.Join(gitHooksDir, gitCommitMessageHookName)
@@ -30,8 +31,8 @@ func TestGitHookInstaller_Install(t *testing.T) {
 }
 
 func TestGitHookInstaller_FileAlreadyExists_NoForce(t *testing.T) {
-	cleanupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	gitFolder := path.Join(testDir, ".git")
 	gitHooksDir := path.Join(gitFolder, "hooks")
 	gitHookFilePath := path.Join(gitHooksDir, gitCommitMessageHookName)
@@ -50,8 +51,8 @@ func TestGitHookInstaller_FileAlreadyExists_NoForce(t *testing.T) {
 }
 
 func TestGitHookInstaller_FileAlreadyExists_WithForce(t *testing.T) {
-	cleanupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	gitFolder := path.Join(testDir, ".git")
 	gitHooksDir := path.Join(gitFolder, "hooks")
 	gitHookFilePath := path.Join(gitHooksDir, gitCommitMessageHookName)
@@ -71,8 +72,8 @@ func TestGitHookInstaller_FileAlreadyExists_WithForce(t *testing.T) {
 }
 
 func TestGitHookInstaller_FileAlreadyExists_WithForce_RemoveFails(t *testing.T) {
-	cleanupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	gitFolder := path.Join(testDir, ".git")
 	gitHooksDir := path.Join(gitFolder, "hooks")
 	gitHookFilePath := path.Join(gitHooksDir, gitCommitMessageHookName)
@@ -96,8 +97,8 @@ func TestGitHookInstaller_FileAlreadyExists_WithForce_RemoveFails(t *testing.T) 
 }
 
 func TestGitHookInstaller_CreateSymlinkFails(t *testing.T) {
-	cleanupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	gitFolder := path.Join(testDir, ".git")
 	gitHooksDir := path.Join(gitFolder, "hooks")
 	err := os.MkdirAll(gitHooksDir, 0777)
@@ -117,8 +118,8 @@ func TestGitHookInstaller_CreateSymlinkFails(t *testing.T) {
 }
 
 func TestGitHookInstaller_CannotGetCurrentExecutableFilePath(t *testing.T) {
-	cleanupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
+	defer testhelper.CleanupTestEnvironment(t)
 	gitFolder := path.Join(testDir, ".git")
 	gitHooksDir := path.Join(gitFolder, "hooks")
 	err := os.MkdirAll(gitHooksDir, 0777)

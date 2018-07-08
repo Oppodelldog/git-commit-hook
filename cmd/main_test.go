@@ -16,7 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testPath = "/tmp/git-commit-hook"
 const featureBranch = "feature/PROJECT-123"
 const nonFeatureBranch = "release/v0.1.2"
 const commitMessageFile = ".git/COMMIT_EDITMSG"
@@ -52,7 +51,7 @@ func restoreOriginals() {
 	rewriteCommitMessageFunc = originals.rewriteCommitMessageFunc
 	exitFunc = originals.exitFunc
 	os.Stdout = originals.osStdout
-	os.RemoveAll(testPath)
+	os.RemoveAll(testhelper.TestPath)
 }
 
 func TestMain_HappyPath(t *testing.T) {
@@ -72,8 +71,8 @@ func TestMain_HappyPath(t *testing.T) {
 
 func TestMain_ConfigurationNotFound(t *testing.T) {
 	defer restoreOriginals()
-
-	initTestFolder(t)
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.InitTestFolder(t)
 	testhelper.InitGitRepository(t, featureBranch)
 
 	initialCommitMessage := "we expect this not to be changed by the tool"
@@ -189,8 +188,8 @@ func TestMain_ErrorCase_EmptyCommitMessageFileName(t *testing.T) {
 
 func TestMain_ErrorCase_CommitMessageFileNotFound(t *testing.T) {
 	defer restoreOriginals()
-	initTestFolder(t)
-	testhelper.WriteConfigFile(t, testPath)
+	testhelper.InitTestFolder(t)
+	testhelper.WriteConfigFile(t, testhelper.TestPath)
 
 	os.Args = []string{"git", commitMessageFile}
 	w, stdOutChannel := captureStdOut(t)
@@ -269,26 +268,9 @@ func captureStdOut(t *testing.T) (*os.File, chan string) {
 }
 
 func initGitRepositoryWithBranchAndConfig(t *testing.T, branchName string) {
-	initTestFolder(t)
+	testhelper.InitTestFolder(t)
 	testhelper.InitGitRepository(t, branchName)
-	testhelper.WriteConfigFile(t, path.Join(testPath, ".git"))
-}
-
-func initTestFolder(t *testing.T) {
-	err := os.RemoveAll(testPath)
-	if err != nil {
-		t.Fatalf("Did not expect os.RemoveAll to return an error, but got: %v ", err)
-	}
-
-	err = os.MkdirAll(testPath, 0777)
-	if err != nil {
-		t.Fatalf("Did not expect os.MkdirAll to return an error, but got: %v ", err)
-	}
-
-	err = os.Chdir(testPath)
-	if err != nil {
-		t.Fatalf("Did not expect os.Chdir to return an error, but got: %v ", err)
-	}
+	testhelper.WriteConfigFile(t, path.Join(testhelper.TestPath, ".git"))
 }
 
 func assertCommitMessage(t *testing.T, expectedCommitMessage string) {

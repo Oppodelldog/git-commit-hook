@@ -11,6 +11,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//TestPath holds the absolute path to the test folder
+const TestPath = "/tmp/git-commit-hook"
+
 //InitGitRepository initializes a test git repository with the given branch name in the current directory
 func InitGitRepository(t *testing.T, branchName string) {
 	t.Helper()
@@ -68,5 +71,40 @@ func Git(t *testing.T, args ...string) {
 	o, err := exec.Command("git", args...).CombinedOutput()
 	if err != nil {
 		t.Fatalf("'git %v init' failed with error: %v - output: %s", args, err, string(o))
+	}
+}
+
+// CleanupTestEnvironment removes all test folders
+func CleanupTestEnvironment(t *testing.T) {
+	err := os.RemoveAll(TestPath)
+	if err != nil {
+		t.Fatalf("Error cleaning up test environment.. Did not expect os.RemoveAll to return an error, but got: %v ", err)
+	}
+}
+
+// PreapreTestEnvironment writes a test config file to the test folder
+func PreapreTestEnvironment(t *testing.T) {
+	WriteConfigFile(t, TestPath)
+	err := os.Chdir(TestPath)
+	if err != nil {
+		t.Fatalf("Error preparing test environment.Did not expect os.Chdir to return an error, but got: %v ", err)
+	}
+}
+
+// InitTestFolder cleans up an eventually existing folder, creates it again and changes working dir to that folder
+func InitTestFolder(t *testing.T) {
+	err := os.RemoveAll(TestPath)
+	if err != nil {
+		t.Fatalf("Did not expect os.RemoveAll to return an error, but got: %v ", err)
+	}
+
+	err = os.MkdirAll(TestPath, 0777)
+	if err != nil {
+		t.Fatalf("Did not expect os.MkdirAll to return an error, but got: %v ", err)
+	}
+
+	err = os.Chdir(TestPath)
+	if err != nil {
+		t.Fatalf("Did not expect os.Chdir to return an error, but got: %v ", err)
 	}
 }
