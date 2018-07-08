@@ -54,5 +54,4 @@ func isCommitHookInstalled(gitFolderPath string) bool {
 	}
 
 	return false
-
 }

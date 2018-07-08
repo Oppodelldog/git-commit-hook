@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testDir = "/tmp/git-commit-hook"
-
 func TestDiagCommand_Diagnostics(t *testing.T) {
 	defer testhelper.CleanupTestEnvironment(t)
 	testhelper.PreapreTestEnvironment(t)
