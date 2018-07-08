@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Oppodelldog/git-commit-hook/config"
-	"github.com/glenn-brown/golang-pkg-pcre/src/pkg/pcre"
+	"github.com/Oppodelldog/git-commit-hook/regexadapter"
 )
 
 type (
@@ -38,7 +38,7 @@ func (v *commitMessageValidator) Validate(branchName, commitMessage string) erro
 	}
 
 	for validationPattern := range validators {
-		if regexMatchesString(validationPattern, commitMessage) {
+		if regexadapter.RegexMatchesString(validationPattern, commitMessage) {
 			return nil
 		}
 	}
@@ -60,6 +60,3 @@ func prepareError(branchName string, validators map[string]string) error {
 	return errors.New(buffer.String())
 }
 
-func regexMatchesString(pattern string, branchName string) bool {
-	return pcre.MustCompile(pattern, 0).MatcherString(branchName, 0).Matches()
-}

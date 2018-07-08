@@ -6,7 +6,7 @@
   # define types of branch and a pattern to identify the type for the current branch you are working on
   branch:
      master: "^(origin\\/)*master"
-     feature: "^((?!master|release|develop).)*$"
+     feature: "^(origin\\/)*feature/.*$"
      develop: "^(origin\\/)*develop$"
      release: "^(origin\\/)*release\\/v([0-9]*\\.*)*$"
      hotfix: "^(origin\\/)*hotfix\\/v([0-9]*\\.*)*$"

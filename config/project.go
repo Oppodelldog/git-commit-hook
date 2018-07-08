@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/glenn-brown/golang-pkg-pcre/src/pkg/pcre"
+	"github.com/Oppodelldog/git-commit-hook/regexadapter"
 )
 
 type (
@@ -23,7 +23,7 @@ type (
 func (projConf *Project) GetBranchType(branchName string) string {
 
 	for branchType, branchTypePattern := range projConf.BranchTypes {
-		if regexMatchesString(string(branchTypePattern), branchName) {
+		if regexadapter.RegexMatchesString(string(branchTypePattern), branchName) {
 			return branchType
 		}
 	}
@@ -42,8 +42,4 @@ func (projConf *Project) GetValidator(branchType string) map[string]string {
 	}
 
 	return foundValidators
-}
-
-func regexMatchesString(pattern string, branchName string) bool {
-	return pcre.MustCompile(pattern, 0).MatcherString(branchName, 0).Matches()
 }

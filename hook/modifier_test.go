@@ -60,7 +60,7 @@ func TestModifyGitCommitMessage(t *testing.T) {
 
 	prjCfg := config.Project{
 		BranchTypes: map[string]config.BranchTypePattern{
-			"feature": `(?m)^((?!master|release|develop).)*$`,
+			"feature": `(?m)^((origin\/)*feature\/.*)|(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`,
 			"release": `(?m)^(origin\/)*release\/v([0-9]*\.*)*(-fix)*$`,
 		},
 		Templates: map[string]config.BranchTypeTemplate{

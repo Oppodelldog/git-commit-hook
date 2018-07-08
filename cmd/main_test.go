@@ -56,6 +56,8 @@ func restoreOriginals() {
 
 func TestMain_HappyPath(t *testing.T) {
 	defer restoreOriginals()
+	defer testhelper.CleanupTestEnvironment(t)
+	testhelper.CleanupTestEnvironment(t)
 
 	initGitRepositoryWithBranchAndConfig(t, featureBranch)
 	setCommitMessage(t, "initial commit")

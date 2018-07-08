@@ -4,7 +4,7 @@
 [[projects]]
   name = "github.com/Oppodelldog/filediscovery"
   packages = ["."]
-  revision = "4da0ea434b80a588ce75c905121d3c9e21ac21c0"
+  revision = "75cb86ab87f615aa3edd8bef4a25a440d3043c32"
   version = "0.1.0"
 
 [[projects]]
@@ -12,12 +12,6 @@
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/glenn-brown/golang-pkg-pcre"
-  packages = ["src/pkg/pcre"]
-  revision = "48bb82a8b8ceea98f4e97825b43870f6ba1970d6"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -46,6 +40,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1656019a652d1f88615d43721c834eff3b0d90513d0e52cc7a8581d6b7c6417e"
+  inputs-digest = "7f8590e7d70f34de22ec875fa798c17f8a76b0b15135d644dda32f4baf016683"
   solver-name = "gps-cdcl"
   solver-version = 1

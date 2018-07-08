@@ -17,7 +17,7 @@ func TestParse(t *testing.T) {
 			Path: "/home/nils/projects/xyz/.git",
 			BranchTypes: map[string]BranchTypePattern{
 				"master":  `^(origin\/)*master`,
-				"feature": `^((?!master|release|develop).)*$`,
+				"feature": `^(origin\/)*feature/.*$`,
 				"develop": `^(origin\/)*develop$`,
 				"release": `^(origin\/)*release\/v([0-9]*\.*)*$`,
 				"hotfix":  `^(origin\/)*hotfix\/v([0-9]*\.*)*$`,
@@ -27,7 +27,7 @@ func TestParse(t *testing.T) {
 			},
 			Validation: map[string]BranchValidationConfiguration{
 				"*": {
-					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID",
+					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID (fallback validator)",
 				},
 				"develop": {
 					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID",

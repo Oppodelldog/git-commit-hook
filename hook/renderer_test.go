@@ -14,7 +14,7 @@ func TestRenderCommitMessage(t *testing.T) {
 	}
 	cfg := &config.Project{
 		BranchTypes: map[string]config.BranchTypePattern{
-			"feature": `(?m)^()((?!master|release|develop).)*$`,
+			"feature": `^(origin\/)*feature/.*$`,
 		},
 		Templates: map[string]config.BranchTypeTemplate{
 			"feature": "{{.BranchName}}: {{.CommitMessage}}",
@@ -34,7 +34,7 @@ func TestRenderCommitMessage_InvalidTemplate_ReturnsError(t *testing.T) {
 	viewModel := ViewModel{}
 	cfg := &config.Project{
 		BranchTypes: map[string]config.BranchTypePattern{
-			"feature": `(?m)^()((?!master|release|develop).)*$`,
+			"feature": `.*`,
 		},
 		Templates: map[string]config.BranchTypeTemplate{
 			"feature": config.BranchTypeTemplate(invalidTemplate),
@@ -53,7 +53,7 @@ func TestRenderCommitMessage_NoTemplateFound_PassesBackTheGivenCommitMessage(t *
 	}
 	cfg := &config.Project{
 		BranchTypes: map[string]config.BranchTypePattern{
-			"feature": `(?m)^()((?!master|release|develop).)*$`,
+			"feature": `.*`,
 		},
 		Templates: map[string]config.BranchTypeTemplate{}}
 
