@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/Oppodelldog/filediscovery"
   packages = ["."]
-  revision = "75cb86ab87f615aa3edd8bef4a25a440d3043c32"
-  version = "0.1.0"
+  revision = "4da0ea434b80a588ce75c905121d3c9e21ac21c0"
+  version = "0.2.0"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -40,6 +40,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7f8590e7d70f34de22ec875fa798c17f8a76b0b15135d644dda32f4baf016683"
+  inputs-digest = "5c6449a75b0cc656d49adb1747d95ee0cd0f85d972bdc4a40e86ec3a9af0a673"
   solver-name = "gps-cdcl"
   solver-version = 1
