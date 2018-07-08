@@ -3,13 +3,16 @@ package subcommand
 import (
 	"sort"
 
-	"github.com/Oppodelldog/git-commit-hook/config"
 	"os"
+
+	"reflect"
+
+	"github.com/Oppodelldog/git-commit-hook/config"
 )
 
 func NewDiagCommand() *DiagCommand {
 	return &DiagCommand{
-		logger:                               logger{os.Stdout},
+		logger: logger{os.Stdout},
 		findConfigurationFilePath:            config.FindConfigurationFilePath,
 		loadConfiguration:                    config.LoadConfiguration,
 		checkIsCommitHookInstalledAtPath:     isCommitHookInstalled,
@@ -68,50 +71,38 @@ func (cmd *DiagCommand) printProjectConfiguration(projectName string, projectCon
 	cmd.stdout("project:", projectName)
 	cmd.stdout("path   :", projectConfiguration.Path)
 	cmd.stdout("\nbranch types:")
-	cmd.printBranchTypes(projectConfiguration.BranchTypes)
+	cmd.printConfigurationMap(projectConfiguration.BranchTypes)
 	cmd.stdout("\nbranch type templates:")
-	cmd.printBranchTemplates(projectConfiguration.Templates)
+	cmd.printConfigurationMap(projectConfiguration.Templates)
 	cmd.stdout("\nbranch type validation:")
-	cmd.printBranchValidation(projectConfiguration.Validation)
+	cmd.printConfigurationMap(projectConfiguration.Validation)
 }
 
-func (cmd *DiagCommand) printBranchTypes(m map[string]config.BranchTypePattern) {
+func (cmd *DiagCommand) printConfigurationMap(m interface{}) {
 	var keys []string
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		cmd.stdout("\t", k, ":", m[k])
-	}
-}
 
-func (cmd *DiagCommand) printBranchTemplates(m map[string]config.BranchTypeTemplate) {
-	var keys []string
-	for k := range m {
-		keys = append(keys, k)
+	for _, value := range reflect.ValueOf(m).MapKeys() {
+		keys = append(keys, value.String())
 	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		cmd.stdout("\t", k, ":", m[k])
-	}
-}
 
-func (cmd *DiagCommand) printBranchValidation(m map[string]config.BranchValidationConfiguration) {
-	var keys []string
-	for k := range m {
-		keys = append(keys, k)
-	}
 	sort.Strings(keys)
+
 	for _, k := range keys {
-		cmd.stdout("\t", k, ":")
-		var keys2 []string
-		for k2 := range m[k] {
-			keys2 = append(keys2, k2)
-		}
-		sort.Strings(keys)
-		for _, k2 := range keys2 {
-			cmd.stdout("\t\t", k2, ":", m[k][k2])
+		switch v := m.(type) {
+		case map[string]config.BranchTypePattern:
+			cmd.stdout("\t", k, ":", v[k])
+		case map[string]config.BranchTypeTemplate:
+			cmd.stdout("\t", k, ":", v[k])
+		case map[string]config.BranchValidationConfiguration:
+			cmd.stdout("\t", k, ":")
+			var keys2 []string
+			for k2 := range v[k] {
+				keys2 = append(keys2, k2)
+			}
+			sort.Strings(keys)
+			for _, k2 := range keys2 {
+				cmd.stdout("\t\t", k2, ":", v[k][k2])
+			}
 		}
 	}
 }

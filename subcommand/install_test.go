@@ -3,12 +3,13 @@ package subcommand
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"os"
 	"bytes"
-	"strings"
-	"github.com/Oppodelldog/git-commit-hook/config"
 	"errors"
+	"os"
+	"strings"
+
+	"github.com/Oppodelldog/git-commit-hook/config"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInstall_UnknownArgument_ShowsUsage(t *testing.T) {
@@ -119,7 +120,7 @@ installing git-commit-hook to 'pathB': OK
 				{"pathB", false},
 			},
 			expectedOutput: "installing git-commit-hook to 'pathB': OK\n",
-	},
+		},
 		"with -f and project name": {
 			additionalOsArgs: []string{"-f", "-p", "projectA"},
 			configuration:    configWithTwoProjects,
@@ -127,7 +128,7 @@ installing git-commit-hook to 'pathB': OK
 				{"pathA", true},
 			},
 			expectedOutput: "installing git-commit-hook to 'pathA': OK\n",
-	},
+		},
 	}
 
 	for testCaseName, testData := range testDataSet {
@@ -186,7 +187,7 @@ func TestInstall_GitHookInstallerReturnsError_ShowError(t *testing.T) {
 		expectedOutput   string
 	}{
 		"all":            {additionalOsArgs: []string{"-a"}, expectedOutput: "installing git-commit-hook to '': some error in git hook installer\ndone with errors\n"},
-		"single project": {additionalOsArgs: []string{"-p", "projectA"}, expectedOutput: "installing git-commit-hook to '': "+ errorMessageStub + "\n"},
+		"single project": {additionalOsArgs: []string{"-p", "projectA"}, expectedOutput: "installing git-commit-hook to '': " + errorMessageStub + "\n"},
 	}
 	for testCaseName, testData := range testDataSet {
 		t.Run(testCaseName, func(t *testing.T) {

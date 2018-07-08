@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type logger struct{
+type logger struct {
 	stdoutWriter io.Writer
 }
 

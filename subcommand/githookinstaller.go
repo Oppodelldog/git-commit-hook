@@ -1,13 +1,13 @@
 package subcommand
 
 import (
-	"os"
 	"errors"
+	"os"
 )
 
 func NewGitHookInstaller() GitHookInstaller {
 	return &gitHookInstaller{
-		logger:                       logger{stdoutWriter: os.Stdout},
+		logger: logger{stdoutWriter: os.Stdout},
 		getCurrentExecutableFilePath: os.Executable,
 		existsFile:                   checkFileExists,
 		removeFile:                   os.Remove,
@@ -22,7 +22,7 @@ type (
 	gitHookInstaller struct {
 		logger
 		getCurrentExecutableFilePath func() (string, error)
-		existsFile                   func(string) (bool)
+		existsFile                   func(string) bool
 		removeFile                   func(string) error
 		createSymlink                func(string, string) error
 	}

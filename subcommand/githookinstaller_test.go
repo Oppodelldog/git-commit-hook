@@ -1,12 +1,13 @@
 package subcommand
 
 import (
-	"testing"
-	"path"
-	"os"
-	"io/ioutil"
-	"github.com/stretchr/testify/assert"
 	"errors"
+	"io/ioutil"
+	"os"
+	"path"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGitHookInstaller_Install(t *testing.T) {
@@ -66,7 +67,7 @@ func TestGitHookInstaller_FileAlreadyExists_WithForce(t *testing.T) {
 	err = installer.installForProject(gitFolder, true)
 
 	assert.NoError(t, err)
-	assertCurrentExecutableIsSymlinkedAsGitHook(t,gitHookFilePath)
+	assertCurrentExecutableIsSymlinkedAsGitHook(t, gitHookFilePath)
 }
 
 func TestGitHookInstaller_FileAlreadyExists_WithForce_RemoveFails(t *testing.T) {
@@ -85,13 +86,13 @@ func TestGitHookInstaller_FileAlreadyExists_WithForce_RemoveFails(t *testing.T) 
 	installer := NewGitHookInstaller()
 
 	removeFileErrorStub := errors.New("some error while removing file")
-	installer.(*gitHookInstaller).removeFile = func(string)(error){
+	installer.(*gitHookInstaller).removeFile = func(string) error {
 		return removeFileErrorStub
 	}
 
 	err = installer.installForProject(gitFolder, true)
 
-	assert.Exactly(t, removeFileErrorStub,err)
+	assert.Exactly(t, removeFileErrorStub, err)
 }
 
 func TestGitHookInstaller_CreateSymlinkFails(t *testing.T) {
@@ -106,13 +107,13 @@ func TestGitHookInstaller_CreateSymlinkFails(t *testing.T) {
 	installer := NewGitHookInstaller()
 
 	createSymlinkErrorStub := errors.New("some error while removing file")
-	installer.(*gitHookInstaller).createSymlink = func(p1 string,p2 string)(error){
+	installer.(*gitHookInstaller).createSymlink = func(p1 string, p2 string) error {
 		return createSymlinkErrorStub
 	}
 
 	err = installer.installForProject(gitFolder, true)
 
-	assert.Exactly(t, createSymlinkErrorStub,err)
+	assert.Exactly(t, createSymlinkErrorStub, err)
 }
 
 func TestGitHookInstaller_CannotGetCurrentExecutableFilePath(t *testing.T) {
@@ -127,13 +128,13 @@ func TestGitHookInstaller_CannotGetCurrentExecutableFilePath(t *testing.T) {
 	installer := NewGitHookInstaller()
 
 	getExecutableFilePathErrorStub := errors.New("some error while removing file")
-	installer.(*gitHookInstaller).getCurrentExecutableFilePath = func()(string,error){
+	installer.(*gitHookInstaller).getCurrentExecutableFilePath = func() (string, error) {
 		return "", getExecutableFilePathErrorStub
 	}
 
 	err = installer.installForProject(gitFolder, true)
 
-	assert.Exactly(t, getExecutableFilePathErrorStub,err)
+	assert.Exactly(t, getExecutableFilePathErrorStub, err)
 }
 
 func assertCurrentExecutableIsSymlinkedAsGitHook(t *testing.T, gitHookFilePath string) {

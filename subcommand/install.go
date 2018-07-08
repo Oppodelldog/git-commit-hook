@@ -79,7 +79,7 @@ func (cmd *InstallCommand) installForAllProjects(configuration *config.Configura
 		if err != nil {
 			cmd.stdout(err, "\n")
 			hasErrors = true
-		}else {
+		} else {
 			cmd.stdout("OK", "\n")
 		}
 	}
