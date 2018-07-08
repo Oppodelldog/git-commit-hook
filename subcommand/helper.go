@@ -23,8 +23,8 @@ func loadProjectConfiguration() (config.Project, error) {
 }
 
 func createCommitHookFilePath(gitFolderPath string) string {
-
 	commitHookFilePath := path.Join(gitFolderPath, "hooks", gitCommitMessageHookName)
+
 	return commitHookFilePath
 }
 

@@ -158,7 +158,7 @@ installing git-commit-hook to 'pathB': OK
 
 func assertContainsEachLine(t *testing.T, expectedOutput string, output string) {
 	expectedOutput = strings.TrimLeft(expectedOutput, "\n")
-	lines := strings.Split(output, "\n")
+	lines := strings.Split(expectedOutput, "\n")
 	for _, line := range lines {
 		assert.Contains(t, output, line)
 	}
