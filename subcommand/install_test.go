@@ -150,8 +150,17 @@ installing git-commit-hook to 'pathB': OK
 			res := cmd.Install()
 
 			assert.Exactly(t, 0, res)
-			assert.Exactly(t, strings.TrimLeft(testData.expectedOutput, "\n"), cmd.stdoutWriter.(*bytes.Buffer).String())
+
+			assertContainsEachLine(t, testData.expectedOutput, cmd.stdoutWriter.(*bytes.Buffer).String())
 		})
+	}
+}
+
+func assertContainsEachLine(t *testing.T, expectedOutput string, output string) {
+	expectedOutput = strings.TrimLeft(expectedOutput, "\n")
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		assert.Contains(t, output, line)
 	}
 }
 
