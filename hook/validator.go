@@ -59,4 +59,3 @@ func prepareError(branchName string, validators map[string]string) error {
 
 	return errors.New(buffer.String())
 }
-

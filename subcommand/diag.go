@@ -13,7 +13,7 @@ import (
 // NewDiagCommand create a new Diag SubCommand
 func NewDiagCommand() *DiagCommand {
 	return &DiagCommand{
-		logger: logger{os.Stdout},
+		logger:                               logger{os.Stdout},
 		findConfigurationFilePath:            config.FindConfigurationFilePath,
 		loadConfiguration:                    config.LoadConfiguration,
 		checkIsCommitHookInstalledAtPath:     isCommitHookInstalled,

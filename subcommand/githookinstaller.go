@@ -8,7 +8,7 @@ import (
 // NewGitHookInstaller creates a new GitHookInstaller
 func NewGitHookInstaller() GitHookInstaller {
 	return &gitHookInstaller{
-		logger: logger{stdoutWriter: os.Stdout},
+		logger:                       logger{stdoutWriter: os.Stdout},
 		getCurrentExecutableFilePath: os.Executable,
 		existsFile:                   checkFileExists,
 		removeFile:                   os.Remove,

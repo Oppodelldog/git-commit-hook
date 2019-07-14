@@ -12,7 +12,7 @@ import (
 // NewTestCommand creates a new Test sub command
 func NewTestCommand() *TestCommand {
 	return &TestCommand{
-		logger: logger{os.Stdout},
+		logger:                                 logger{os.Stdout},
 		findConfigurationFilePath:              config.FindConfigurationFilePath,
 		loadConfiguration:                      config.LoadConfiguration,
 		loadProjectConfigurationByName:         config.LoadProjectConfigurationByName,

@@ -31,16 +31,16 @@ func TestParse(t *testing.T) {
 				},
 				"develop": {
 					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID",
-					"(?m)@noissue":                                      "@noissue",
+					"(?m)@noissue": "@noissue",
 				},
 				"release": {
 					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID",
-					"(?m)@rc-fix":                                       "an @rc-fix indicator",
-					"(?m)@noissue":                                      "@noissue",
+					"(?m)@rc-fix":  "an @rc-fix indicator",
+					"(?m)@noissue": "@noissue",
 				},
 				"master": {
 					`(?m)(?:\s|^|/)(([A-Z](_)*)+-[0-9]+)([\s,;:!.-]|$)`: "valid ticket ID",
-					"(?m)@noissue":                                      "@noissue",
+					"(?m)@noissue": "@noissue",
 				},
 			},
 		},

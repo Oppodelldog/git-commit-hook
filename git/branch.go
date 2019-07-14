@@ -1,6 +1,7 @@
 package git
 
 import (
+	"os"
 	"os/exec"
 	"regexp"
 )
@@ -11,7 +12,18 @@ var execFunc = execFuncDef(exec.Command)
 
 //GetCurrentBranchName executes 'git branch' to get the current branch
 func GetCurrentBranchName() (string, error) {
-	outputBytes, err := execFunc("git", "branch").CombinedOutput()
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return GetCurrentBranchNameFromDirectory(wd)
+}
+
+//GetCurrentBranchName executes 'git branch' to get the current branch in the given directory
+func GetCurrentBranchNameFromDirectory(directory string) (string, error) {
+	cmd := execFunc("git", "branch")
+	cmd.Dir = directory
+	outputBytes, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", err
 	}

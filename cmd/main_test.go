@@ -31,7 +31,7 @@ var originals = struct {
 	exitFunc                 exitFuncDef
 	osStdout                 *os.File
 }{
-	osArgs: os.Args,
+	osArgs:                   os.Args,
 	rewriteCommitMessageFunc: rewriteCommitMessageFunc,
 	diagnosticsFunc:          diagnosticsFunc,
 	testFunc:                 testFunc,
